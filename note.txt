@@ -1,0 +1,83 @@
+LOGIN Command
+
+   Arguments:  user name
+               password
+
+   Responses:  no specific responses for this command
+
+   Result:     OK - login completed, now in authenticated state
+               NO - login failure: user name or password rejected
+               BAD - command unknown or arguments invalid
+
+      The LOGIN command identifies the client to the server and carries
+      the plaintext password authenticating this user.
+
+
+TAG: 
+There are two cases in which a line from the client does not represent a complete command:
+    CASE 1: a command argument is quoted with an octet count (see the description of literal in Stringunder Data Formats); 
+    CASe 2: the command arguments require server feedback (see the AUTHENTICATE command).
+
+In either case, the server sends a command continuation request response if it is ready for the octets (if appropriate) and the remainder of the command.
+This response is prefixed with the token "+".
+
+Formal Syntax:
+Rules:
+(1) Except as noted otherwise, all alphabetic characters
+        are case-insensitive.  The use of upper or lower case
+        characters to define token strings is for editorial clarity
+        only.  Implementations MUST accept these strings in a
+        case-insensitive fashion.
+
+        (2) In all cases, SP refers to exactly one space.  It is
+        NOT permitted to substitute TAB, insert additional spaces,
+        or otherwise treat SP as being equivalent to LWSP.
+
+        (3) The ASCII NUL character, %x00, MUST NOT be used at any
+        time.
+select = "SELECT" SP mailbox
+tag = 1*<any ASTRING-CHAR except "+">
+
+
+
+For Retrieve Command:
+seq-number definition:
+ A relative position from 1 to the number of messages in the mailbox.
+   This position MUST be ordered by ascending unique identifier.  As
+   each new message is added, it is assigned a message sequence number
+   that is 1 higher than the number of messages in the mailbox before
+   that new message was added.
+
+   Message sequence numbers can be reassigned during the session.  For
+   example, when a message is permanently removed (expunged) from the
+   mailbox, the message sequence number for all subsequent messages is
+   decremented.  The number of messages in the mailbox is also
+   decremented.  Similarly, a new message can be assigned a message
+   sequence number that was once held by some other message prior to an
+   expunge.
+
+   In addition to accessing messages by relative position in the
+   mailbox, message sequence numbers can be used in mathematical
+   calculations.  For example, if an untagged "11 EXISTS" is received,
+   and previously an untagged "8 EXISTS" was received, three new
+   messages have arrived with message sequence numbers of 9, 10, and 11.
+   Another example, if message 287 in a 523 message mailbox has UID
+   12345, there are exactly 286 messages which have lesser UIDs and 236
+   messages which have greater UIDs.
+
+   seq-number      = nz-number / "*"
+                    ; message sequence number (COPY, FETCH, STORE
+                    ; commands) or unique identifier (UID COPY,
+                    ; UID FETCH, UID STORE commands).
+                    ; * represents the largest number in use.  In
+                    ; the case of message sequence numbers, it is
+                    ; the number of messages in a non-empty mailbox.
+                    ; In the case of unique identifiers, it is the
+                    ; unique identifier of the last message in the
+                    ; mailbox or, if the mailbox is empty, the
+                    ; mailbox's current UIDNEXT value.
+                    ; The server should respond with a tagged BAD
+                    ; response to a command that uses a message
+                    ; sequence number greater than the number of
+                    ; messages in the selected mailbox.  This
+                    ; includes "*" if the selected mailbox is empty.
