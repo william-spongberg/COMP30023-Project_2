@@ -13,6 +13,12 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // *TODO*
+    // fetchmail
+    // -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t]
+    // <command> <server_name>
+    // Where <command> may be one of: retrieve, parse, mime, or list
+
     const char *hostname = argv[1];
     struct addrinfo hints, *result;
 
