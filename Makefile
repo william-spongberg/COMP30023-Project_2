@@ -11,7 +11,7 @@ HDR = $(wildcard $(SRC_DIR)/*.h)
 # create object files from source files
 OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
 
-EXE=allocate
+EXE=fetchmail
 
 all: $(EXE)
 
