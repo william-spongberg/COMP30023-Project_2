@@ -1,9 +1,9 @@
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <netdb.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #define _POSIX_C_SOURCE 200112L
 
@@ -19,36 +19,53 @@ int main(int argc, char *argv[]) {
     // <command> <server_name>
     // Where <command> may be one of: retrieve, parse, mime, or list
 
+    int connfd = 0;
     const char *hostname = argv[1];
-    struct addrinfo hints, *result;
+    struct addrinfo hints, *result, *rp;
 
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP socket
 
     // connecting to port 143 (IMAP)
     int status = getaddrinfo(hostname, "143", &hints, &result);
-    if (status != 0) {
-        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-        exit(EXIT_FAILURE);
+
+    // try to connect to each address in the list
+    for (rp = result; rp != NULL; rp = rp->ai_next) {
+        // check if hostname is valid
+        if (status == 0) {
+            // create a socket
+            connfd = socket(rp->ai_family, rp->ai_socktype,
+                            rp->ai_protocol);
+            if (connfd == -1) {
+                perror("socket");
+                continue;
+            }
+
+            // connect to server through socket
+            status = connect(connfd, rp->ai_addr, rp->ai_addrlen);
+            if (status == -1) {
+                perror("connect");
+                continue;
+            }
+
+            // successfully connected
+            printf("Connected to %s\n", hostname);
+            break;
+        } else {
+            fprintf(stderr, "getnameinfo error: %s\n", gai_strerror(status));
+        }
     }
 
-    // create a socket
-    int sockfd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (sockfd == -1) {
-        perror("socket");
-        exit(EXIT_FAILURE);
-    }
-
-    // connect to server through socket
-    status = connect(sockfd, result->ai_addr, result->ai_addrlen);
-    if (status == -1) {
-        perror("connect");
+    if (rp == NULL) {
+        fprintf(stderr, "Could not connect to %s\n", hostname);
         exit(EXIT_FAILURE);
     }
 
     // close socket and free addrinfo
-    close(sockfd);
+    if (connfd != -1) {
+        close(connfd);
+    }
     freeaddrinfo(result);
     return 0;
 }
