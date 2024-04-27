@@ -81,3 +81,7 @@ seq-number definition:
                     ; sequence number greater than the number of
                     ; messages in the selected mailbox.  This
                     ; includes "*" if the selected mailbox is empty.
+
+
+Examples:
+folders can be like "inbox" "bin" "spam" etc.
