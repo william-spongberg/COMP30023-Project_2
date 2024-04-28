@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void read(int argc, char *argv[], char *hostname, char *password, char *folder, int *message_num, char *command, char *server_name);
+void read(int argc, char *argv[], const char *hostname,
+          const char *password, const char *folder, int *message_num,
+          char *command, char *server_name);
 
 #endif
