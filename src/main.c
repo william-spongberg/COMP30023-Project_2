@@ -2,8 +2,8 @@
 #include "read.h"
 #include "login.h"
 #include <netdb.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -24,26 +24,34 @@
 #define REALLOC_SIZE 2
 
 void get_tag(char *buffer, size_t size);
-void send_command(char **tag, char *command, char **buffer,
-                  int connfd, FILE *stream);
+void send_command(char **tag, char *command, char **buffer, int connfd,
+                  FILE *stream);
 char *create_command(int num_strs, ...);
 int setup_connection(char *hostname);
 void check_memory(void *args);
 void free_memory(int connfd, FILE *stream, int num_ptrs, ...);
+void parse_mime(char *buffer);
 
 int main(int argc, char *argv[]) {
     char *username = NULL;
     char *password = NULL;
     char *folder = NULL;
-    char *message_num = NULL;
-    int num = 0;
+    char *str_message_num = NULL;
+    int int_message_num = 0;
     char *command = NULL;
     char *hostname = NULL;
 
     // read command line arguments
-    read_command_line(argc, argv, &username, &password, &folder, &message_num,
-                      &command, &hostname);
-    num = atoi(message_num);
+    read_command_line(argc, argv, &username, &password, &folder,
+                      &str_message_num, &command, &hostname);
+    int_message_num = atoi(str_message_num);
+
+    printf("Username: %s\n", username);
+    printf("Password: %s\n", password);
+    printf("Folder: %s\n", folder);
+    printf("Message number: %d\n", int_message_num);
+    printf("Command: %s\n", command);
+    printf("Hostname: %s\n", hostname);
 
     // setup connection
     int connfd = setup_connection(hostname);
@@ -52,9 +60,9 @@ int main(int argc, char *argv[]) {
     FILE *stream = fdopen(connfd, "r+");
 
     // initialise buffer
-    char *buffer = (char*) calloc(MAX_DATA_SIZE, sizeof(char));
+    char *buffer = (char *)calloc(MAX_DATA_SIZE, sizeof(char));
     check_memory(buffer);
-    char *tag = (char*) calloc(MAX_TAG_SIZE, sizeof(char));
+    char *tag = (char *)calloc(MAX_TAG_SIZE, sizeof(char));
     check_memory(tag);
     get_tag(tag, MAX_TAG_SIZE);
 
@@ -71,32 +79,86 @@ int main(int argc, char *argv[]) {
     free(select);
 
     // commands
-    if (strcmp(command, "retrieve")) {
+    if (strcmp(command, "retrieve") == 0) {
+        printf("|Retrieve command|\n");
         // retrieve command
-        char *retrieve = create_command(3, FETCH, message_num, BODY);
-        send_command(&tag, retrieve, &buffer, connfd, stream);
+        char *body = create_command(3, FETCH, str_message_num, BODY);
+        send_command(&tag, body, &buffer, connfd, stream);
+        // print response
+        printf("Received: %s\n", buffer);
+        printf("\n");
         memset(buffer, 0, MAX_DATA_SIZE);
-        free(retrieve);
-    } else if (strcmp(command, "parse")) {
+        free(body);
+    } else if (strcmp(command, "parse") == 0) {
+        printf("|Parse command|\n");
         // parse command
-        char *headers = create_command(3, FETCH, message_num, BODY_HEADERS);
+        char *headers = create_command(3, FETCH, str_message_num, BODY_HEADERS);
         send_command(&tag, headers, &buffer, connfd, stream);
         parse_headers(buffer);
         memset(buffer, 0, MAX_DATA_SIZE);
         free(headers);
-    } else if (strcmp(command, "mime")) {
+    } else if (strcmp(command, "mime") == 0) {
+        printf("|MIME command|\n");
         // mime command
-        char *retrieve = create_command(3, FETCH, message_num, BODY);
-        send_command(&tag, retrieve, &buffer, connfd, stream);
-        //parse_mime(buffer);
+        char *body = create_command(3, FETCH, str_message_num, BODY);
+        send_command(&tag, body, &buffer, connfd, stream);
+        parse_mime(buffer);
         memset(buffer, 0, MAX_DATA_SIZE);
-        free(retrieve);
+        free(body);
     }
 
     // free memory
     free_memory(connfd, stream, 2, tag, buffer);
 
     return 0;
+}
+
+void parse_mime(char *buffer) {
+    // match mime boundary
+    char *tmp = strstr(buffer, "boundary=");
+    if (tmp == NULL) {
+        fprintf(stderr, "No boundary found\n");
+        exit(4);
+    }
+
+    // get boundary
+    char *start = strchr(tmp, '=') + 1;
+    char *end = strchr(tmp, '\r');
+    tmp = (char *)malloc(end - start + 1);
+    strncpy(tmp, start, end - start);
+    tmp[end - start] = '\0';
+
+    char *boundary = (char *)malloc(strlen(tmp) + 3);
+    strcpy(boundary, "--");
+    strcat(boundary, tmp);
+    printf("Boundary: %s\n", boundary);
+
+    // get headers using position given by boundary
+    char *hdr = strstr(buffer, boundary);
+    start = strstr(hdr, "Content-Transfer-Encoding: ");
+    start = strchr(start, ' ') + 1;
+    end = strchr(start, '\r');
+    char *encoding = (char *)malloc(end - start + 1);
+    strncpy(encoding, start, end - start);
+    encoding[end - start] = '\0';
+    printf("Content-Transfer-Encoding: %s\n", encoding);
+    
+    start = strstr(hdr, "Content-Type: ");
+    start = strchr(start, ' ') + 1;
+    end = strchr(start, '\r');
+    encoding = (char *)malloc(end - start + 1);
+    strncpy(encoding, start, end - start);
+    encoding[end - start] = '\0';
+    printf("Content-Type: %s\n", encoding);
+
+    start = strstr(hdr, "\r\n\r\n");
+    start += 4;
+    end = strstr(start, boundary);
+    char *message = (char *)malloc(end - start + 1);
+    strncpy(message, start, end - start);
+    message[end - start] = '\0';
+    printf("[Start Message]%s", message);
+    printf("[End Message]\n\n");
 }
 
 void free_memory(int connfd, FILE *stream, int num_ptrs, ...) {
@@ -218,8 +280,8 @@ void get_tag(char *buffer, size_t size) {
     }
 }
 
-void send_command(char **tag, char *command, char **buffer,
-                  int connfd, FILE *stream) {
+void send_command(char **tag, char *command, char **buffer, int connfd,
+                  FILE *stream) {
     // initialise command
     get_tag(*tag, MAX_TAG_SIZE);
     char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 2);
@@ -232,7 +294,7 @@ void send_command(char **tag, char *command, char **buffer,
     printf("Sent: %s\n", total_command);
 
     // receive first response from server
-    char line[MAX_LINE_SIZE];   
+    char line[MAX_LINE_SIZE];
     fgets(line, MAX_LINE_SIZE, stream);
     strcat(*buffer, line);
 
@@ -260,10 +322,6 @@ void send_command(char **tag, char *command, char **buffer,
         strcat(*buffer, line);
         // printf("%s", line);
     }
-
-    // print response
-    printf("Received: %s\n", *buffer);
-    printf("\n");
 
     // free memory
     free(total_command);
