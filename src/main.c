@@ -7,10 +7,10 @@
 
 #define _POSIX_C_SOURCE 200112L
 
-#define PORT "143" // IMAP port
+#define IMAP_PORT "143"
 #define MAX_TAG 10000
-#define MAX_TAG_SIZE 4
-#define MAX_DATASIZE 1024
+#define MAX_TAG_SIZE 5
+#define MAX_DATASIZE 4096
 
 void get_tag(char *buffer, size_t size);
 
