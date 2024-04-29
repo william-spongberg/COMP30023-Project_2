@@ -17,8 +17,6 @@
 #define EOL_SIZE 2
 #define DEFAULT_FOLDER "INBOX"
 
-
-
 // Helper function to construct message in appropriate format
 char *construct_login_message(char *username, char *password) {
     // Allocate memory for the login command
@@ -46,7 +44,7 @@ char *construct_login_message(char *username, char *password) {
 
 // Implement the logon function
 int login(const int *client_socket_fd, char *username, char *password) {
-    char* login_command = construct_login_message(username, password);
+    char *login_command = construct_login_message(username, password);
 
     // Send the login command to the server already connected via TCP
     int byte_send =
@@ -63,7 +61,7 @@ int login(const int *client_socket_fd, char *username, char *password) {
 int verify_login(const int *client_socket_fd) {
     // 1 for single space
     int buf_size = TAG_SIZE + 1 + 2 + 2;
-    char *response = (char*)malloc(buf_size);
+    char *response = (char *)malloc(buf_size);
     int byte_received = recv(*client_socket_fd, response, buf_size, 0);
 
     // Fatal response
@@ -91,7 +89,7 @@ char *construct_select_msg(char *folder) {
         folder_name_size = (int)strlen(folder);
     }
 
-    char *msg = (char*)malloc(TAG_SIZE + SELECT_COMMAND_SIZE +
+    char *msg = (char *)malloc(TAG_SIZE + SELECT_COMMAND_SIZE +
                                folder_name_size + EOL_SIZE + 2);
 
     msg = memcpy(msg, SELECT_TAG, TAG_SIZE);
@@ -102,14 +100,12 @@ char *construct_select_msg(char *folder) {
     strcat(msg, EOL);
 
     return msg;
-
 }
 
 int select_folder(const int *client_socket_fd, char *folder) {
     char *select_cmd = construct_select_msg(folder);
 
-    int byte_send = send(*client_socket_fd, select_cmd,
-                         strlen(select_cmd), 0);
+    int byte_send = send(*client_socket_fd, select_cmd, strlen(select_cmd), 0);
 
     if (byte_send == -1) {
         perror("send failure at selecting folder");
@@ -123,11 +119,11 @@ int select_folder(const int *client_socket_fd, char *folder) {
 int verify_folder_selection(const int *client_socket_fd) {
     // Receive response from server
     int buf_size = 1 + TAG_SIZE + 2 + 2;
-    char *response = (char*)malloc(buf_size);
+    char *response = (char *)malloc(buf_size);
     int byte_received = recv(*client_socket_fd, response, buf_size, 0);
 
     // Set up expected response for comparison
-    char* expected_response = (char*) malloc(6);
+    char *expected_response = (char *)malloc(6);
     expected_response[0] = '*';
     expected_response = strcat(expected_response, SELECT_TAG);
     expected_response = strcat(expected_response, "OK");

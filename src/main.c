@@ -16,19 +16,18 @@
 #define MAX_TAG_SIZE 4
 #define MAX_DATASIZE 4096
 #define MAX_LINESIZE 1024
-#define MAX_COMMAND_SIZE 256
 
 void get_tag(char *buffer, size_t size);
-void send_command(char *tag, char *command, char *line, char **buffer,
+void send_command(char **tag, char *command, char *line, char **buffer,
                   int connfd, FILE *stream);
 
 int main(int argc, char *argv[]) {
-    const char *username = malloc(MAX_COMMAND_SIZE);
-    const char *password = malloc(MAX_COMMAND_SIZE);
-    const char *folder = malloc(MAX_COMMAND_SIZE);
+    char *username = NULL;
+    char *password = NULL;
+    char *folder = NULL;
     int message_num = 0;
-    const char *command = malloc(MAX_COMMAND_SIZE);
-    const char *hostname = malloc(MAX_COMMAND_SIZE);
+    char *command = NULL;
+    char *hostname = NULL;
 
     read_command_line(argc, argv, &username, &password, &folder, &message_num,
                       &command, &hostname);
@@ -98,7 +97,6 @@ int main(int argc, char *argv[]) {
     get_tag(tag, MAX_TAG_SIZE);
 
     // login command
-    // char *login = " LOGIN test@comp30023 pass\r\n";
     char *login =
         malloc(strlen(LOGIN) + strlen(username) + strlen(password) + 4);
     strcpy(login, LOGIN);
@@ -106,7 +104,8 @@ int main(int argc, char *argv[]) {
     strcat(login, " ");
     strcat(login, password);
     strcat(login, "\r\n");
-    send_command(tag, login, line, &buffer, connfd, stream);
+    send_command(&tag, login, line, &buffer, connfd, stream);
+    memset(line, 0, sizeof(line));
     memset(buffer, 0, MAX_DATASIZE);
 
     // select command
@@ -114,27 +113,43 @@ int main(int argc, char *argv[]) {
     strcpy(select, SELECT);
     strcat(select, folder);
     strcat(select, "\r\n");
-    send_command(tag, select, line, &buffer, connfd, stream);
+    send_command(&tag, select, line, &buffer, connfd, stream);
+    memset(line, 0, sizeof(line));
     memset(buffer, 0, MAX_DATASIZE);
 
-    // retrieve command
-    char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
-    send_command(tag, retrieve, line, &buffer, connfd, stream);
-    memset(buffer, 0, MAX_DATASIZE);
-
-    // parse command
-    char *fetch =
-        " FETCH 1 BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]\r\n";
-    send_command(tag, fetch, line, &buffer, connfd, stream);
-    parse_headers(buffer);
-    memset(buffer, 0, MAX_DATASIZE);
+    // commands
+    if (strcmp(command, "retrieve")) {
+        // retrieve command
+        char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
+        send_command(&tag, retrieve, line, &buffer, connfd, stream);
+        memset(line, 0, sizeof(line));
+        memset(buffer, 0, MAX_DATASIZE);
+        // free(retrieve);
+    } else if (strcmp(command, "parse")) {
+        // parse command
+        char *fetch =
+            " FETCH 1 BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]\r\n";
+        send_command(&tag, fetch, line, &buffer, connfd, stream);
+        parse_headers(buffer);
+        memset(line, 0, sizeof(line));
+        memset(buffer, 0, MAX_DATASIZE);
+        // free(fetch);
+    }
 
     // free memory
     free(tag);
+    free(buffer);
+    free(login);
+    free(select);
 
     // close socket
     if (connfd != -1) {
         close(connfd);
+    }
+
+    // close file
+    if (stream != NULL) {
+        fclose(stream);
     }
     return 0;
 }
@@ -151,12 +166,12 @@ void get_tag(char *buffer, size_t size) {
     }
 }
 
-void send_command(char *tag, char *command, char *line, char **buffer,
+void send_command(char **tag, char *command, char *line, char **buffer,
                   int connfd, FILE *stream) {
     // initialise command
-    get_tag(tag, MAX_TAG_SIZE);
-    char *total_command = (char *)malloc(strlen(tag) + strlen(command) + 1);
-    strcpy(total_command, tag);
+    get_tag(*tag, MAX_TAG_SIZE);
+    char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 1);
+    strcpy(total_command, *tag);
     strcat(total_command, command);
 
     // send command to server
@@ -175,7 +190,9 @@ void send_command(char *tag, char *command, char *line, char **buffer,
     }
 
     // confirm command
-    char *confirm_command = strcat(tag, " OK");
+    char *confirm_command = malloc(strlen(*tag) + 4);
+    strcpy(confirm_command, *tag);
+    strcat(confirm_command, " OK");
     while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
         fgets(line, MAX_DATASIZE, stream);
         strcat(*buffer, line);
@@ -184,4 +201,5 @@ void send_command(char *tag, char *command, char *line, char **buffer,
     printf("Received: %s\n", *buffer);
     printf("\n");
     free(total_command);
+    free(confirm_command);
 }

@@ -7,23 +7,22 @@
 // <command> <server_name>
 // Where <command> may be one of: retrieve, parse, mime, or list
 
-void read_command_line(int argc, char *argv[], const char **username,
-                       const char **password, const char **folder,
-                       int *message_num, const char **command,
-                       const char **server_name) {
+void read_command_line(int argc, char *argv[], char **username, char **password,
+                       char **folder, int *message_num, char **command,
+                       char **server_name) {
     int opt;
     while ((opt = getopt(argc, argv, "u:p:f:n:")) != -1) {
         switch (opt) {
         case 'u':
-            *username = strdup(optarg);
+            *username = optarg;
             assert(*username != NULL);
             break;
         case 'p':
-            *password = strdup(optarg);
+            *password = optarg;
             assert(*password != NULL);
             break;
         case 'f':
-            *folder = strdup(optarg);
+            *folder = optarg;
             assert(*folder != NULL);
             break;
         case 'n':
@@ -52,9 +51,9 @@ void read_command_line(int argc, char *argv[], const char **username,
     // }
 
     // // get command and server name
-    *command = strdup(argv[optind]);
+    *command = argv[optind];
     printf("command: %s\n", *command);
-    *server_name = strdup(argv[optind + 1]);
+    *server_name = argv[optind + 1];
     printf("server_name: %s\n", *server_name);
 
     // check if command is valid

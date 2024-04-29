@@ -2,16 +2,22 @@
 
 void parse_headers(char *buffer) {
     // get headers from first occurence of header title
-    char *from = strstr(buffer, "From: ");
-    char *to = strstr(buffer, "To: ");
-    char *date = strstr(buffer, "Date: ");
-    char *subject = strstr(buffer, "Subject: ");
+    char *from = get_message(strstr(buffer, "From: "));
+    char *to = get_message(strstr(buffer, "To: "));
+    char *date = get_message(strstr(buffer, "Date: "));
+    char *subject = get_message(strstr(buffer, "Subject: "));
 
-    // print headers or empty string or error message
-    printf("From: %s\n", get_message(from));
-    printf("To: %s\n", get_message(to));
-    printf("Date: %s\n", get_message(date));
-    printf("Subject: %s\n", get_message(subject));
+    // print headers
+    printf("From: %s\n", from);
+    printf("To: %s\n", to);
+    printf("Date: %s\n", date);
+    printf("Subject: %s\n", subject);
+
+    // free memory
+    free(from);
+    free(to);
+    free(date);
+    free(subject);
 }
 
 char *get_message(char *header) {
