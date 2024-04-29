@@ -1,5 +1,6 @@
 #include "parse.h"
 #include "read.h"
+#include "login.h"
 #include <netdb.h>
 #include <stdarg.h>
 #include <stdio.h>
