@@ -7,7 +7,7 @@
 #include <string.h>
 
 void read_command_line(int argc, char *argv[], char **username, char **password,
-                       char **folder, int *message_num, char **command,
+                       char **folder, char **message_num, char **command,
                        char **server_name);
 
 #endif

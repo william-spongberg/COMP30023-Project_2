@@ -8,7 +8,7 @@
 // Where <command> may be one of: retrieve, parse, mime, or list
 
 void read_command_line(int argc, char *argv[], char **username, char **password,
-                       char **folder, int *message_num, char **command,
+                       char **folder, char **message_num, char **command,
                        char **server_name) {
     int opt;
     while ((opt = getopt(argc, argv, "u:p:f:n:")) != -1) {
@@ -26,7 +26,7 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             assert(*folder != NULL);
             break;
         case 'n':
-            *message_num = atoi(optarg);
+            *message_num = optarg;
             break;
             // case 't':
             //     // only specified if using TLS (extension task)
