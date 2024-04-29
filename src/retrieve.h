@@ -5,4 +5,8 @@
 #ifndef RETRIEVE_H
 #define RETRIEVE_H
 
+#define RETRIEVE_CMD_TAG "A02"
+
+
+
 #endif
