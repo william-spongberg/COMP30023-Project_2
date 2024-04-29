@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "parse.h"
 
 #define _POSIX_C_SOURCE 200112L
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
             status = connect(connfd, rp->ai_addr, rp->ai_addrlen);
             if (status == -1) {
                 perror("connect");
-                continue;
+                exit(2);
             }
 
             // successfully connected
@@ -76,38 +77,48 @@ int main(int argc, char *argv[]) {
 
     // initialise buffers
     char *buffer = malloc(MAX_DATASIZE);
+    if (buffer == NULL) {
+        fprintf(stderr, "Failed to allocate memory\n");
+        exit(5);
+    }
+    memset(buffer, 0, MAX_DATASIZE);
+
     char line[MAX_LINESIZE];
     memset(line, 0, sizeof(line));
-    memset(buffer, 0, sizeof(buffer));
 
     // initialise tag
     char *tag = malloc(MAX_TAG_SIZE);
+    if (tag == NULL) {
+        fprintf(stderr, "Failed to allocate memory\n");
+        exit(5);
+    }
     get_tag(tag, MAX_TAG_SIZE);
 
     // login command
     char *login = " LOGIN test@comp30023 pass\r\n";
     send_command(tag, login, line, &buffer, connfd, stream);
-    memset(buffer, 0, sizeof(buffer));
+    memset(buffer, 0, MAX_DATASIZE);
 
     // select command
     char *select = " SELECT Test\r\n";
     send_command(tag, select, line, &buffer, connfd, stream);
-    memset(buffer, 0, sizeof(buffer));
+    memset(buffer, 0, MAX_DATASIZE);
 
     // retrieve command
     char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
     send_command(tag, retrieve, line, &buffer, connfd, stream);
-    memset(buffer, 0, sizeof(buffer));
+    memset(buffer, 0, MAX_DATASIZE);
 
     // parse command
     char *fetch =
         " FETCH 1 BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]\r\n";
     send_command(tag, fetch, line, &buffer, connfd, stream);
     parse_headers(buffer);
-    memset(buffer, 0, sizeof(buffer));
+    memset(buffer, 0, MAX_DATASIZE);
 
     // free memory
     free(tag);
+    //free(buffer);
 
     // close socket
     if (connfd != -1) {
