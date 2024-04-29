@@ -33,7 +33,8 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             //     break;
         default:
             fprintf(stderr,
-                    "Usage: -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t]\n <command> <server_name> \n");
+                    "Usage: -u <username> -p <password> [-f <folder>] [-n "
+                    "<messageNum>] [-t]\n <command> <server_name> \n");
             exit(1);
         }
     }
@@ -42,15 +43,16 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
     // check if all required arguments are present
     // TODO: update to allow optional args
     if (optind + 2 != argc) {
-        fprintf(stderr, "Usage: -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t]\n <command> <server_name> \n");
+        fprintf(stderr, "Usage: -u <username> -p <password> [-f <folder>] [-n "
+                        "<messageNum>] [-t]\n <command> <server_name> \n");
         exit(1);
     }
 
     // // get command and server name
     *command = argv[optind];
-    //printf("command: %s\n", *command);
+    // printf("command: %s\n", *command);
     *server_name = argv[optind + 1];
-    //printf("server_name: %s\n", *server_name);
+    // printf("server_name: %s\n", *server_name);
 
     // check if command is valid
     if (strcmp(*command, "retrieve") != 0 && strcmp(*command, "parse") != 0 &&
