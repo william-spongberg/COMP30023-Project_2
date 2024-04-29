@@ -1,7 +1,7 @@
 #include "parse.h"
 
 void parse_headers(char *buffer) {
-        // get headers from first occurence of header title
+    // get headers from first occurence of header title
     char *from = strstr(buffer, "From: ");
     char *to = strstr(buffer, "To: ");
     char *date = strstr(buffer, "Date: ");
