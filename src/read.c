@@ -19,7 +19,7 @@ void read_user_input(int argc, char *argv[], char *hostname, char *password,
             *message_num = atoi(optarg);
             break;
         case 't':
-            // FIXME: Need to figure out what the input format is for this tag
+            // -t specifies that TLS is being used (extra credit task)
         default:
             fprintf(stderr,
                     "Usage: %s -h <hostname> -p <password> -f <folder> -n "
