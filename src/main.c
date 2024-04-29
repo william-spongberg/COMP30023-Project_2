@@ -83,6 +83,9 @@ int main(int argc, char *argv[]) {
         // retrieve command
         char *body = create_command(3, FETCH, str_message_num, BODY);
         send_command(&tag, body, &buffer, connfd, stream);
+        // print response
+        printf("Received: %s\n", buffer);
+        printf("\n");
         memset(buffer, 0, MAX_DATA_SIZE);
         free(body);
     } else if (strcmp(command, "parse") == 0) {
@@ -127,33 +130,24 @@ void parse_mime(char *buffer) {
     char *boundary = (char *)malloc(strlen(tmp) + 3);
     strcpy(boundary, "--");
     strcat(boundary, tmp);
-
     printf("Boundary: %s\n", boundary);
 
+    // get headers using position given by boundary
     char *hdr = strstr(buffer, boundary);
-    //printf("Headers: %s\n", hdr);
-
-    // get headers
-    // Content-Type: text/plain; charset="utf-8"
-    // Content-Transfer-Encoding: quoted-printable
-
-    // get headers using position given by end
     start = strstr(hdr, "Content-Transfer-Encoding: ");
     start = strchr(start, ' ') + 1;
     end = strchr(start, '\r');
     char *encoding = (char *)malloc(end - start + 1);
     strncpy(encoding, start, end - start);
     encoding[end - start] = '\0';
-    
     printf("Content-Transfer-Encoding: %s\n", encoding);
-
+    
     start = strstr(hdr, "Content-Type: ");
     start = strchr(start, ' ') + 1;
     end = strchr(start, '\r');
     encoding = (char *)malloc(end - start + 1);
     strncpy(encoding, start, end - start);
     encoding[end - start] = '\0';
-
     printf("Content-Type: %s\n", encoding);
 
     start = strstr(hdr, "\r\n\r\n");
@@ -162,7 +156,7 @@ void parse_mime(char *buffer) {
     char *message = (char *)malloc(end - start + 1);
     strncpy(message, start, end - start);
     message[end - start] = '\0';
-    printf("\n\n[Start Message]%s", message);
+    printf("[Start Message]%s", message);
     printf("[End Message]\n\n");
 }
 
@@ -327,10 +321,6 @@ void send_command(char **tag, char *command, char **buffer, int connfd,
         strcat(*buffer, line);
         // printf("%s", line);
     }
-
-    // print response
-    printf("Received: %s\n", *buffer);
-    printf("\n");
 
     // free memory
     free(total_command);
