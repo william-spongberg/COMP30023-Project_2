@@ -134,6 +134,7 @@ int main(int argc, char *argv[]) {
 }
 
 void parse_mime(char *buffer) {
+    // TODO: error handling
     // match mime boundary
     char *tmp = strstr(buffer, "boundary=");
     if (tmp == NULL) {
@@ -162,6 +163,9 @@ void parse_mime(char *buffer) {
     strncpy(encoding, start, end - start);
     encoding[end - start] = '\0';
     printf("Content-Transfer-Encoding: %s\n", encoding);
+
+    // free memory
+    free(encoding);
     
     start = strstr(hdr, "Content-Type: ");
     start = strchr(start, ' ') + 1;
@@ -179,6 +183,12 @@ void parse_mime(char *buffer) {
     message[end - start] = '\0';
     printf("[Start Message]%s", message);
     printf("[End Message]\n\n");
+
+    // free memory
+    free(tmp);
+    free(boundary);
+    free(encoding);
+    free(message);
 }
 
 void free_memory(int connfd, FILE *stream, int num_ptrs, ...) {
