@@ -9,7 +9,7 @@
 
 #define IMAP_PORT "143"
 #define MAX_TAG 10000
-#define MAX_TAG_SIZE 5
+#define MAX_TAG_SIZE 4
 #define MAX_DATASIZE 4096
 
 void get_tag(char *buffer, size_t size);
