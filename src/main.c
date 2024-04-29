@@ -151,6 +151,17 @@ void send_command(char *tag, char *command, char *line, char **buffer,
     write(connfd, total_command, strlen(total_command));
     printf("Sent: %s\n", total_command);
 
+    // receive first response from server
+    fgets(line, MAX_DATASIZE, stream);
+    strcat(*buffer, line);
+
+    // check if server is ready
+    if (strncmp(*buffer, "* ", 2) != 0) {
+        fprintf(stderr, "Server not ready\n");
+        fprintf(stderr, "Received: %s\n", *buffer);
+        exit(EXIT_FAILURE);
+    }
+
     // confirm command
     char *confirm_command = strcat(tag, " OK");
     while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
