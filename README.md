@@ -2,4 +2,6 @@
 
 Format: ./fetchmail -u <username> -p <password> -f <folder> -n <messageNum> -t <command> <server_name>
 
-Test: ./fetchmail unimelb-comp30023-2024.cloud.edu.au
+Test: ./fetchmail -u test@comp30023 -p pass -f Test -n 1 retrieve unimelb-comp30023-2024.cloud.edu.au
+
+Debug: valgrind -s --leak-check=full --show-leak-kinds=all ./fetchmail -u test@comp30023 -p pass -f Test -n 1 retrieve unimelb-comp30023-2024.cloud.edu.au

@@ -18,17 +18,15 @@
 #define DEFAULT_FOLDER "INBOX"
 #define MAX_DATA_SIZE 4096
 
-
-
 // Helper function to construct message in appropriate format
 char *construct_login_message(char *username, char *password) {
     // Allocate memory for the login command
     int username_length = strlen(username);
     int password_length = strlen(password);
-    char *login_command = (char*)malloc(TAG_SIZE + LOGIN_COMMAND_SIZE +
-                                         username_length + password_length +
-                                         SPACE_COUNT + EOL_SIZE + 1);
-    if(login_command == NULL) {
+    char *login_command =
+        (char *)malloc(TAG_SIZE + LOGIN_COMMAND_SIZE + username_length +
+                       password_length + SPACE_COUNT + EOL_SIZE + 1);
+    if (login_command == NULL) {
         perror("malloc");
         exit(1);
     }
@@ -47,11 +45,11 @@ char *construct_login_message(char *username, char *password) {
 
 // Implement the logon function
 int login(const int *client_socket_fd, char *username, char *password) {
-    char* login_command = construct_login_message(username, password);
+    char *login_command = construct_login_message(username, password);
 
     // Send the login command to the server already connected via TCP
-    int byte_send = send(*client_socket_fd, login_command,
-                         strlen(login_command), 0);
+    int byte_send =
+        send(*client_socket_fd, login_command, strlen(login_command), 0);
     if (byte_send == -1) {
         perror("send");
         return -1;
@@ -65,6 +63,7 @@ int verify_login(const int *client_socket_fd) {
     // 1 for single space 2 for "OK", 1 for end single space, and 1 for null terminator
     int buf_size = TAG_SIZE + 1 + 2 + 1 + 1;
     char *response = (char*)malloc(buf_size);
+
 
     // Read from the server for response
     int recv_len;
@@ -96,7 +95,7 @@ char *construct_select_msg(char *folder) {
         folder_name_size = (int)strlen(folder);
     }
 
-    char *msg = (char*)malloc(TAG_SIZE + SELECT_COMMAND_SIZE +
+    char *msg = (char *)malloc(TAG_SIZE + SELECT_COMMAND_SIZE +
                                folder_name_size + EOL_SIZE + 2);
 
     msg = memcpy(msg, SELECT_TAG, TAG_SIZE);
@@ -107,14 +106,12 @@ char *construct_select_msg(char *folder) {
     strcat(msg, EOL);
 
     return msg;
-
 }
 
 int select_folder(const int *client_socket_fd, char *folder) {
     char *select_cmd = construct_select_msg(folder);
 
-    int byte_send = send(*client_socket_fd, select_cmd,
-                         strlen(select_cmd), 0);
+    int byte_send = send(*client_socket_fd, select_cmd, strlen(select_cmd), 0);
 
     if (byte_send == -1) {
         perror("send");
@@ -137,6 +134,7 @@ int verify_folder_selection(const int *client_socket_fd) {
         fprintf(stderr, "Failed to receive response\n");
         return -1;
     }
+
 
     if (recv_len == 0) {
         perror("recv");
