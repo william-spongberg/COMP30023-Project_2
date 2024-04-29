@@ -1,37 +1,39 @@
+#include "parse.h"
+#include "read.h"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "parse.h"
 
 #define _POSIX_C_SOURCE 200112L
 
 #define IMAP_PORT "143"
+#define LOGIN " LOGIN "
+#define SELECT " SELECT "
 #define MAX_TAG 10000
 #define MAX_TAG_SIZE 4
 #define MAX_DATASIZE 4096
 #define MAX_LINESIZE 1024
+#define MAX_COMMAND_SIZE 256
 
 void get_tag(char *buffer, size_t size);
 void send_command(char *tag, char *command, char *line, char **buffer,
                   int connfd, FILE *stream);
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <hostname>\n", argv[0]);
-        exit(1);
-    }
+    const char *username = malloc(MAX_COMMAND_SIZE);
+    const char *password = malloc(MAX_COMMAND_SIZE);
+    const char *folder = malloc(MAX_COMMAND_SIZE);
+    int message_num = 0;
+    const char *command = malloc(MAX_COMMAND_SIZE);
+    const char *hostname = malloc(MAX_COMMAND_SIZE);
 
-    // *TODO*
-    // fetchmail
-    // -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t]
-    // <command> <server_name>
-    // Where <command> may be one of: retrieve, parse, mime, or list
+    read_command_line(argc, argv, &username, &password, &folder, &message_num,
+                      &command, &hostname);
 
     int connfd = 0;
-    const char *hostname = argv[1];
     struct addrinfo hints, *result, *rp;
 
     memset(&hints, 0, sizeof(hints));
@@ -96,12 +98,22 @@ int main(int argc, char *argv[]) {
     get_tag(tag, MAX_TAG_SIZE);
 
     // login command
-    char *login = " LOGIN test@comp30023 pass\r\n";
+    // char *login = " LOGIN test@comp30023 pass\r\n";
+    char *login =
+        malloc(strlen(LOGIN) + strlen(username) + strlen(password) + 4);
+    strcpy(login, LOGIN);
+    strcat(login, username);
+    strcat(login, " ");
+    strcat(login, password);
+    strcat(login, "\r\n");
     send_command(tag, login, line, &buffer, connfd, stream);
     memset(buffer, 0, MAX_DATASIZE);
 
     // select command
-    char *select = " SELECT Test\r\n";
+    char *select = malloc(strlen(SELECT) + strlen(folder) + 4);
+    strcpy(select, SELECT);
+    strcat(select, folder);
+    strcat(select, "\r\n");
     send_command(tag, select, line, &buffer, connfd, stream);
     memset(buffer, 0, MAX_DATASIZE);
 
@@ -167,7 +179,7 @@ void send_command(char *tag, char *command, char *line, char **buffer,
     while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
         fgets(line, MAX_DATASIZE, stream);
         strcat(*buffer, line);
-        //printf("%s", line);
+        // printf("%s", line);
     }
     printf("Received: %s\n", *buffer);
     printf("\n");
