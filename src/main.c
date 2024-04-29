@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     printf("Folder: %s\n", folder);
     printf("Message number: %d\n", int_message_num);
     printf("Command: %s\n", command);
-    printf("Hostname: %s\n", hostname);
+    printf("Hostname: %s\n\n", hostname);
 
     // setup connection
     int connfd = setup_connection(hostname);
@@ -68,12 +68,18 @@ int main(int argc, char *argv[]) {
     // login command
     char *login = create_command(3, LOGIN, username, password);
     send_command(&tag, login, &buffer, connfd, stream);
+    // print response
+    printf("Received: %s\n", buffer);
+    printf("\n");
     memset(buffer, 0, MAX_DATA_SIZE);
     free(login);
 
     // select command
     char *select = create_command(2, SELECT, folder);
     send_command(&tag, select, &buffer, connfd, stream);
+    // print response
+    printf("Received: %s\n", buffer);
+    printf("\n");
     memset(buffer, 0, MAX_DATA_SIZE);
     free(select);
 
@@ -104,6 +110,20 @@ int main(int argc, char *argv[]) {
         parse_mime(buffer);
         memset(buffer, 0, MAX_DATA_SIZE);
         free(body);
+    } else if (strcmp(command, "list") == 0) {
+        printf("|List command|\n");
+        // TODO: fix list command not returning anything
+        // list command
+        char *list = create_command(1, "UID FETCH 1:* (UID)");
+        send_command(&tag, list, &buffer, connfd, stream);
+        // print response
+        printf("Received: %s\n", buffer);
+        printf("\n");
+        memset(buffer, 0, MAX_DATA_SIZE);
+        free(list);
+    } else {
+        fprintf(stderr, "Invalid command\n");
+        exit(1);
     }
 
     // free memory
