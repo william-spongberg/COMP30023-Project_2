@@ -66,8 +66,11 @@ int main(int argc, char *argv[]) {
     // login to server
     write(connfd, "a LOGIN test@comp30023 pass\n", 29);
 
-    // read response from server
+    // initialise buffer
     char buffer[1024];
+    memset(buffer, 0, sizeof(buffer));
+
+    // read response from server
     read(connfd, buffer, 1024);
     printf("%s\n", buffer);
 
