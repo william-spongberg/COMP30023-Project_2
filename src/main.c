@@ -68,6 +68,10 @@ int main(int argc, char *argv[]) {
     }
     freeaddrinfo(result);
 
+    // initialise buffer
+    char buffer[MAX_DATASIZE];
+    memset(buffer, 0, sizeof(buffer));
+
     // initialise tag
     char *tag = malloc(MAX_TAG_SIZE);
     get_tag(tag, MAX_TAG_SIZE);
@@ -81,10 +85,6 @@ int main(int argc, char *argv[]) {
     // send login command to server
     printf("%s\n", login_command);
     write(connfd, login_command, strlen(login_command));
-
-    // initialise buffer
-    char buffer[MAX_DATASIZE];
-    memset(buffer, 0, sizeof(buffer));
 
     // read response from server
     read(connfd, buffer, MAX_DATASIZE);
@@ -117,6 +117,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+// generate a unique tag that is used to identify each command
+// increments the tag each time it is called
 void get_tag(char *buffer, size_t size) {
     static int tag = 0;
     if (tag < MAX_TAG) {
