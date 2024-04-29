@@ -62,14 +62,13 @@ int login(const int *client_socket_fd, char *username, char *password) {
 }
 
 int verify_login(const int *client_socket_fd) {
-    // 1 for single space 2 for "OK", 1 for end single space, and 1 for null terminator
-    int buf_size = TAG_SIZE + 1 + 2 + 1 + 1;
-    char *response = (char*)malloc(buf_size);
+    char response[MAX_DATA_SIZE];
 
     // Read from the server for response
     int recv_len;
-    recv_len = recv(*client_socket_fd, response, buf_size, 0);
+    recv_len = recv(*client_socket_fd, response, MAX_DATA_SIZE, 0);
     reponse[recv_len] = '\0'; // Null terminate the received message
+    
     if (recv_len == -1) {
         perror("recv");
         fprintf(stderr, "Failed to receive response\n");
