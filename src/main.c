@@ -7,10 +7,10 @@
 
 #define _POSIX_C_SOURCE 200112L
 
-#define PORT "143" // IMAP port
+#define IMAP_PORT "143"
 #define MAX_TAG 10000
-#define MAX_TAG_SIZE 4
-#define MAX_DATASIZE 1024
+#define MAX_TAG_SIZE 5
+#define MAX_DATASIZE 4096
 
 void get_tag(char *buffer, size_t size);
 
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP socket
 
-    int status = getaddrinfo(hostname, PORT, &hints, &result);
+    int status = getaddrinfo(hostname, IMAP_PORT, &hints, &result);
 
     // try to connect to each address in the list
     for (rp = result; rp != NULL; rp = rp->ai_next) {
