@@ -21,7 +21,7 @@ void send_command(char *tag, char *command, char *line, char **buffer,
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <hostname>\n", argv[0]);
-        exit(EXIT_FAILURE);
+        exit(1);
     }
 
     // *TODO*
@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
             status = connect(connfd, rp->ai_addr, rp->ai_addrlen);
             if (status == -1) {
                 perror("connect");
+                fprintf(stderr, "Could not connect to %s\n", hostname);
                 exit(2);
             }
 
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
     }
     if (rp == NULL) {
         fprintf(stderr, "Could not connect to %s\n", hostname);
-        exit(EXIT_FAILURE);
+        exit(2);
     }
     freeaddrinfo(result);
 
@@ -118,7 +119,6 @@ int main(int argc, char *argv[]) {
 
     // free memory
     free(tag);
-    //free(buffer);
 
     // close socket
     if (connfd != -1) {
@@ -135,7 +135,7 @@ void get_tag(char *buffer, size_t size) {
         snprintf(buffer, size, "%d", tag++);
     } else {
         fprintf(stderr, "Exceeded maximum number of tags\n");
-        exit(EXIT_FAILURE);
+        exit(5);
     }
 }
 
@@ -159,7 +159,7 @@ void send_command(char *tag, char *command, char *line, char **buffer,
     if (strncmp(*buffer, "* ", 2) != 0) {
         fprintf(stderr, "Server not ready\n");
         fprintf(stderr, "Received: %s\n", *buffer);
-        exit(EXIT_FAILURE);
+        exit(3);
     }
 
     // confirm command

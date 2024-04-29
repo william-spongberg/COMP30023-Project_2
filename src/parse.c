@@ -8,13 +8,16 @@ void parse_headers(char *buffer) {
     char *subject = strstr(buffer, "Subject: ");
 
     // print headers or empty string or error message
-    printf("From: %s\n", get_message(from) ? get_message(from) : "");
-    printf("To: %s\n", get_message(to) ? get_message(to) : "");
-    printf("Date: %s\n", get_message(date) ? get_message(date) : "");
-    printf("Subject: %s\n", get_message(subject) ? get_message(subject) : "<No subject>");
+    printf("From: %s\n", get_message(from));
+    printf("To: %s\n", get_message(to));
+    printf("Date: %s\n", get_message(date));
+    printf("Subject: %s\n", get_message(subject));
 }
 
 char *get_message(char *header) {
+    if (header == NULL) {
+        exit(3);
+    }
     // remove first word
     char *start = strchr(header, ' ') + 1;
     // remove trailing chars after message
