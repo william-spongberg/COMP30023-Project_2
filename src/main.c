@@ -96,8 +96,9 @@ int main(int argc, char *argv[]) {
     memset(buffer, 0, sizeof(buffer));
 
     // retrieve command
-    // char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
-    // send_command(tag, retrieve, buffer, connfd, stream);
+    char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
+    send_command(tag, retrieve, line, &buffer, connfd, stream);
+    memset(buffer, 0, sizeof(buffer));
 
     // parse command
     char *fetch =
@@ -115,6 +116,8 @@ int main(int argc, char *argv[]) {
     printf("To: %s\n", get_message(to) ? get_message(to) : "");
     printf("Date: %s\n", get_message(date) ? get_message(date) : "");
     printf("Subject: %s\n", get_message(subject) ? get_message(subject) : "<No subject>");
+
+    memset(buffer, 0, sizeof(buffer));
 
     // free memory
     free(tag);
