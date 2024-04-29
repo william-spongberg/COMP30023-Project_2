@@ -8,6 +8,11 @@
 #define _POSIX_C_SOURCE 200112L
 
 #define PORT "143" // IMAP port
+#define MAX_TAG 10000
+#define MAX_TAG_SIZE 4
+#define MAX_DATASIZE 1024
+
+void get_tag(char *buffer, size_t size);
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -63,27 +68,61 @@ int main(int argc, char *argv[]) {
     }
     freeaddrinfo(result);
 
-    // login to server
-    write(connfd, "a LOGIN test@comp30023 pass\n", 29);
+    // initialise tag
+    char *tag = malloc(MAX_TAG_SIZE);
+    get_tag(tag, MAX_TAG_SIZE);
+
+    // initalise login command
+    char *login = " LOGIN test@comp30023 pass\n";    
+    char *login_command = (char *)malloc(strlen(tag) + strlen(login) + 1);
+    strcpy(login_command, tag);
+    strcat(login_command, login);
+
+    // send login command to server
+    printf("%s\n", login_command);
+    write(connfd, login_command, strlen(login_command));
 
     // initialise buffer
-    char buffer[1024];
+    char buffer[MAX_DATASIZE];
     memset(buffer, 0, sizeof(buffer));
 
     // read response from server
-    read(connfd, buffer, 1024);
+    read(connfd, buffer, MAX_DATASIZE);
     printf("%s\n", buffer);
 
-    // access "Test" folder
-    write(connfd, "b SELECT Test\n", 15);
+    // initalise select command
+    get_tag(tag, MAX_TAG_SIZE);
+    char *select = " SELECT Test\n";
+    char *select_command = (char *)malloc(strlen(tag) + strlen(select) + 1);
+    strcpy(select_command, tag);
+    strcat(select_command, select);
+
+    // send select command to server
+    printf("%s\n", select_command);
+    write(connfd, select_command, strlen(select_command));
 
     // read response from server
-    read(connfd, buffer, 1024);
+    read(connfd, buffer, MAX_DATASIZE);
     printf("%s\n", buffer);
+
+    // free memory
+    free(login_command);
+    free(select_command);
+    free(tag);
 
     // close socket
     if (connfd != -1) {
         close(connfd);
     }
     return 0;
+}
+
+void get_tag(char *buffer, size_t size) {
+    static int tag = 0;
+    if (tag < MAX_TAG) {
+        snprintf(buffer, size, "%d", tag++);
+    } else {
+        fprintf(stderr, "Exceeded maximum number of tags\n");
+        exit(EXIT_FAILURE);
+    }
 }
