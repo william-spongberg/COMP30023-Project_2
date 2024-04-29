@@ -1,3 +1,7 @@
+//
+// Created by liang on 4/27/2024.
+//
+
 #ifndef PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
 #define PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
 
@@ -17,5 +21,7 @@
  */
 int login(const int *client_socket_fd, char *username, char *password);
 int verify_login(const int *client_socket_fd);
+int select_folder(const int *client_socket_fd, char *folder);
+int verify_folder_selection(const int *client_socket_fd);
 
 #endif // PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
