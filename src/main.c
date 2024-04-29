@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
             }
 
             // successfully connected
-            printf("Connected to %s\n", hostname);
+            printf("Connected to %s\n\n", hostname);
             break;
         } else {
             fprintf(stderr, "getnameinfo error: %s\n", gai_strerror(status));
@@ -68,6 +68,9 @@ int main(int argc, char *argv[]) {
     }
     freeaddrinfo(result);
 
+    // initialise stream
+    FILE *stream = fdopen(connfd, "r+");
+
     // initialise buffer
     char buffer[MAX_DATASIZE];
     memset(buffer, 0, sizeof(buffer));
@@ -77,33 +80,60 @@ int main(int argc, char *argv[]) {
     get_tag(tag, MAX_TAG_SIZE);
 
     // initalise login command
-    char *login = " LOGIN test@comp30023 pass\n";    
+    char *login = " LOGIN test@comp30023 pass\r\n";    
     char *login_command = (char *)malloc(strlen(tag) + strlen(login) + 1);
     strcpy(login_command, tag);
     strcat(login_command, login);
 
     // send login command to server
-    printf("%s\n", login_command);
     write(connfd, login_command, strlen(login_command));
+    printf("Sent: %s\n", login_command);
 
-    // read response from server
-    read(connfd, buffer, MAX_DATASIZE);
-    printf("%s\n", buffer);
+    // confirm login
+    char* confirm_login = strcat(tag, " OK");
+    while (strncmp(buffer, confirm_login, strlen(confirm_login)) != 0) {
+        fgets(buffer, MAX_DATASIZE, stream);
+        printf("%s\n", buffer);
+    }
+    printf("\n");
 
     // initalise select command
     get_tag(tag, MAX_TAG_SIZE);
-    char *select = " SELECT Test\n";
+    char *select = " SELECT Test\r\n";
     char *select_command = (char *)malloc(strlen(tag) + strlen(select) + 1);
     strcpy(select_command, tag);
     strcat(select_command, select);
 
     // send select command to server
-    printf("%s\n", select_command);
     write(connfd, select_command, strlen(select_command));
+    printf("Sent: %s\n", select_command);
 
-    // read response from server
-    read(connfd, buffer, MAX_DATASIZE);
-    printf("%s\n", buffer);
+    // confirm selection
+    char* confirm_select = strcat(tag, " OK");
+    while (strncmp(buffer, confirm_select, strlen(confirm_select)) != 0) {
+        fgets(buffer, MAX_DATASIZE, stream);
+        printf("%s", buffer);
+    }
+    printf("\n");
+
+    // initialise retrieve command
+    get_tag(tag, MAX_TAG_SIZE);
+    char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
+    char *retrieve_command = (char *)malloc(strlen(tag) + strlen(retrieve) + 1);
+    strcpy(retrieve_command, tag);
+    strcat(retrieve_command, retrieve);
+
+    // send retrieve command to server
+    write(connfd, retrieve_command, strlen(retrieve_command));
+    printf("Sent: %s\n", retrieve_command);
+
+    // confirm retrieval
+    char* confirm_retrieve = strcat(tag, " OK");
+    while (strncmp(buffer, confirm_retrieve, strlen(confirm_retrieve)) != 0) {
+        fgets(buffer, MAX_DATASIZE, stream);
+        printf("%s", buffer);
+    }
+    printf("\n");
 
     // free memory
     free(login_command);
