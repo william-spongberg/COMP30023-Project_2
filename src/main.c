@@ -16,6 +16,7 @@
 #define MAX_TAG_SIZE 4
 #define MAX_DATASIZE 4096
 #define MAX_LINESIZE 1024
+#define REALLOC_SIZE 2
 
 void get_tag(char *buffer, size_t size);
 void send_command(char **tag, char *command, char *line, char **buffer,
@@ -194,7 +195,15 @@ void send_command(char **tag, char *command, char *line, char **buffer,
     strcpy(confirm_command, *tag);
     strcat(confirm_command, " OK");
     while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
-        fgets(line, MAX_DATASIZE, stream);
+        fgets(line, MAX_LINESIZE, stream);
+        // realloc buffer if needed
+        if (strlen(*buffer) + strlen(line) >= MAX_DATASIZE) {
+            *buffer = realloc(*buffer, strlen(*buffer)*REALLOC_SIZE + 1);
+            if (*buffer == NULL) {
+                fprintf(stderr, "Failed to allocate memory\n");
+                exit(5);
+            }
+        }
         strcat(*buffer, line);
         // printf("%s", line);
     }
