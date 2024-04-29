@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "parse.h"
 
 #define _POSIX_C_SOURCE 200112L
 
@@ -11,13 +12,16 @@
 #define MAX_TAG 10000
 #define MAX_TAG_SIZE 4
 #define MAX_DATASIZE 4096
+#define MAX_LINESIZE 1024
 
 void get_tag(char *buffer, size_t size);
+void send_command(char *tag, char *command, char *line, char **buffer,
+                  int connfd, FILE *stream);
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <hostname>\n", argv[0]);
-        exit(EXIT_FAILURE);
+        exit(1);
     }
 
     // *TODO*
@@ -52,7 +56,8 @@ int main(int argc, char *argv[]) {
             status = connect(connfd, rp->ai_addr, rp->ai_addrlen);
             if (status == -1) {
                 perror("connect");
-                continue;
+                fprintf(stderr, "Could not connect to %s\n", hostname);
+                exit(2);
             }
 
             // successfully connected
@@ -64,80 +69,55 @@ int main(int argc, char *argv[]) {
     }
     if (rp == NULL) {
         fprintf(stderr, "Could not connect to %s\n", hostname);
-        exit(EXIT_FAILURE);
+        exit(2);
     }
     freeaddrinfo(result);
 
     // initialise stream
     FILE *stream = fdopen(connfd, "r+");
 
-    // initialise buffer
-    char buffer[MAX_DATASIZE];
-    memset(buffer, 0, sizeof(buffer));
+    // initialise buffers
+    char *buffer = malloc(MAX_DATASIZE);
+    if (buffer == NULL) {
+        fprintf(stderr, "Failed to allocate memory\n");
+        exit(5);
+    }
+    memset(buffer, 0, MAX_DATASIZE);
+
+    char line[MAX_LINESIZE];
+    memset(line, 0, sizeof(line));
 
     // initialise tag
     char *tag = malloc(MAX_TAG_SIZE);
-    get_tag(tag, MAX_TAG_SIZE);
-
-    // initalise login command
-    char *login = " LOGIN test@comp30023 pass\r\n";    
-    char *login_command = (char *)malloc(strlen(tag) + strlen(login) + 1);
-    strcpy(login_command, tag);
-    strcat(login_command, login);
-
-    // send login command to server
-    write(connfd, login_command, strlen(login_command));
-    printf("Sent: %s\n", login_command);
-
-    // confirm login
-    char* confirm_login = strcat(tag, " OK");
-    while (strncmp(buffer, confirm_login, strlen(confirm_login)) != 0) {
-        fgets(buffer, MAX_DATASIZE, stream);
-        printf("%s\n", buffer);
+    if (tag == NULL) {
+        fprintf(stderr, "Failed to allocate memory\n");
+        exit(5);
     }
-    printf("\n");
-
-    // initalise select command
     get_tag(tag, MAX_TAG_SIZE);
+
+    // login command
+    char *login = " LOGIN test@comp30023 pass\r\n";
+    send_command(tag, login, line, &buffer, connfd, stream);
+    memset(buffer, 0, MAX_DATASIZE);
+
+    // select command
     char *select = " SELECT Test\r\n";
-    char *select_command = (char *)malloc(strlen(tag) + strlen(select) + 1);
-    strcpy(select_command, tag);
-    strcat(select_command, select);
+    send_command(tag, select, line, &buffer, connfd, stream);
+    memset(buffer, 0, MAX_DATASIZE);
 
-    // send select command to server
-    write(connfd, select_command, strlen(select_command));
-    printf("Sent: %s\n", select_command);
-
-    // confirm selection
-    char* confirm_select = strcat(tag, " OK");
-    while (strncmp(buffer, confirm_select, strlen(confirm_select)) != 0) {
-        fgets(buffer, MAX_DATASIZE, stream);
-        printf("%s", buffer);
-    }
-    printf("\n");
-
-    // initialise retrieve command
-    get_tag(tag, MAX_TAG_SIZE);
+    // retrieve command
     char *retrieve = " FETCH 1 BODY.PEEK[]\r\n";
-    char *retrieve_command = (char *)malloc(strlen(tag) + strlen(retrieve) + 1);
-    strcpy(retrieve_command, tag);
-    strcat(retrieve_command, retrieve);
+    send_command(tag, retrieve, line, &buffer, connfd, stream);
+    memset(buffer, 0, MAX_DATASIZE);
 
-    // send retrieve command to server
-    write(connfd, retrieve_command, strlen(retrieve_command));
-    printf("Sent: %s\n", retrieve_command);
-
-    // confirm retrieval
-    char* confirm_retrieve = strcat(tag, " OK");
-    while (strncmp(buffer, confirm_retrieve, strlen(confirm_retrieve)) != 0) {
-        fgets(buffer, MAX_DATASIZE, stream);
-        printf("%s", buffer);
-    }
-    printf("\n");
+    // parse command
+    char *fetch =
+        " FETCH 1 BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]\r\n";
+    send_command(tag, fetch, line, &buffer, connfd, stream);
+    parse_headers(buffer);
+    memset(buffer, 0, MAX_DATASIZE);
 
     // free memory
-    free(login_command);
-    free(select_command);
     free(tag);
 
     // close socket
@@ -155,6 +135,41 @@ void get_tag(char *buffer, size_t size) {
         snprintf(buffer, size, "%d", tag++);
     } else {
         fprintf(stderr, "Exceeded maximum number of tags\n");
-        exit(EXIT_FAILURE);
+        exit(5);
     }
+}
+
+void send_command(char *tag, char *command, char *line, char **buffer,
+                  int connfd, FILE *stream) {
+    // initialise command
+    get_tag(tag, MAX_TAG_SIZE);
+    char *total_command = (char *)malloc(strlen(tag) + strlen(command) + 1);
+    strcpy(total_command, tag);
+    strcat(total_command, command);
+
+    // send command to server
+    write(connfd, total_command, strlen(total_command));
+    printf("Sent: %s\n", total_command);
+
+    // receive first response from server
+    fgets(line, MAX_DATASIZE, stream);
+    strcat(*buffer, line);
+
+    // check if server is ready
+    if (strncmp(*buffer, "* ", 2) != 0) {
+        fprintf(stderr, "Server not ready\n");
+        fprintf(stderr, "Received: %s\n", *buffer);
+        exit(3);
+    }
+
+    // confirm command
+    char *confirm_command = strcat(tag, " OK");
+    while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
+        fgets(line, MAX_DATASIZE, stream);
+        strcat(*buffer, line);
+        //printf("%s", line);
+    }
+    printf("Received: %s\n", *buffer);
+    printf("\n");
+    free(total_command);
 }
