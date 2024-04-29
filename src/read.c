@@ -1,7 +1,8 @@
 #include "read.h"
 
-void read_user_input(int argc, char *argv[], char *hostname, char *password, char *folder,
-          int *message_num, char *command, char *server_name) {
+void read_user_input(int argc, char *argv[], char *hostname, char *password,
+                     char *folder, int *message_num, char *command,
+                     char *server_name) {
     int opt;
     while (opt = getopt(argc, argv, "h:p:f:m:c:s:"), opt != -1) {
         switch (opt) {
