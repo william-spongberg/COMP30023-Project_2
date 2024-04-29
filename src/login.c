@@ -1,7 +1,3 @@
-//
-// Created by liang on 4/27/2024.
-//
-
 #include "login.h"
 #include <string.h>
 
@@ -43,6 +39,32 @@ char *construct_login_message(char *username, char *password) {
     return login_command;
 }
 
+
+int verify_login(const int *client_socket_fd) {
+    char response[MAX_DATA_SIZE];
+
+    // Read from the server for response
+    int recv_len;
+    recv_len = recv(*client_socket_fd, response, MAX_DATA_SIZE, 0);
+    reponse[recv_len] = '\0'; // Null terminate the received message
+    
+    if (recv_len == -1) {
+        perror("recv");
+        fprintf(stderr, "Failed to receive response\n");
+        return -2;
+    }
+
+    // If the response does not start with the tag, then it is a fatal response
+    if (strncmp(response, LOGIN_TAG, TAG_SIZE) != 0) {
+        perror("login");
+        fprintf(stderr, "Failed to login\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+
 // Implement the logon function
 int login(const int *client_socket_fd, char *username, char *password) {
     char *login_command = construct_login_message(username, password);
@@ -52,33 +74,14 @@ int login(const int *client_socket_fd, char *username, char *password) {
         send(*client_socket_fd, login_command, strlen(login_command), 0);
     if (byte_send == -1) {
         perror("send");
+        fprintf(stderr, "Failed to send login command\n");
         return -1;
     }
     // Free the memory allocated for the logon command
     free(login_command);
-    return 0;
-}
 
-int verify_login(const int *client_socket_fd) {
-    // 1 for single space 2 for "OK", 1 for end single space, and 1 for null terminator
-    int buf_size = TAG_SIZE + 1 + 2 + 1 + 1;
-    char *response = (char*)malloc(buf_size);
-
-
-    // Read from the server for response
-    int recv_len;
-    recv_len = recv(*client_socket_fd, response, buf_size, 0);
-    response[recv_len] = '\0'; // Null terminate the received message
-    if (recv_len == -1) {
-        perror("recv");
-        fprintf(stderr, "Failed to receive response\n");
-        return -1;
-    }
-
-    // If the response does not start with the tag, then it is a fatal response
-    if (strncmp(response, LOGIN_TAG, TAG_SIZE) != 0) {
-        perror("login");
-        fprintf(stderr, "Failed to login\n");
+    // Verify that login was successful
+    if (verify_login(client_socket_fd) == -1) {
         return -1;
     }
 
@@ -106,21 +109,6 @@ char *construct_select_msg(char *folder) {
     strcat(msg, EOL);
 
     return msg;
-}
-
-int select_folder(const int *client_socket_fd, char *folder) {
-    char *select_cmd = construct_select_msg(folder);
-
-    int byte_send = send(*client_socket_fd, select_cmd, strlen(select_cmd), 0);
-
-    if (byte_send == -1) {
-        perror("send");
-        fprintf(stderr, "Failed to send select folder command\n");
-        return -1;
-    }
-
-    free(select_cmd);
-    return 0;
 }
 
 int verify_folder_selection(const int *client_socket_fd) {
@@ -157,5 +145,26 @@ int verify_folder_selection(const int *client_socket_fd) {
         return -1;
     } 
 
+    // TODO: if msg_num from the command is not found, it is assigned to the last email added, which is the number of email in the mailbox, which is received here
+
     return 0;
 }
+
+
+int select_folder(const int *client_socket_fd, char *folder) {
+    char *select_cmd = construct_select_msg(folder);
+
+    int byte_send = send(*client_socket_fd, select_cmd, strlen(select_cmd), 0);
+
+    if (byte_send == -1) {
+        perror("send");
+        fprintf(stderr, "Failed to send select folder command\n");
+        return -1;
+    }
+
+    verify_folder_selection(client_socket_fd);
+
+    free(select_cmd);
+    return 0;
+}
+
