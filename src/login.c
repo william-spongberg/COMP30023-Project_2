@@ -62,7 +62,6 @@ int login(const int *client_socket_fd, char *username, char *password) {
 int verify_login(const int *client_socket_fd) {
     char response[MAX_DATA_SIZE];
 
-
     // Read from the server for response
     int recv_len;
     recv_len = recv(*client_socket_fd, response, MAX_DATA_SIZE, 0);
