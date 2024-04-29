@@ -16,6 +16,7 @@
 #define EOL "\r\n"
 #define EOL_SIZE 2
 #define DEFAULT_FOLDER "INBOX"
+#define MAX_DATA_SIZE 4096
 
 
 
@@ -61,24 +62,28 @@ int login(const int *client_socket_fd, char *username, char *password) {
 }
 
 int verify_login(const int *client_socket_fd) {
-    // 1 for single space
-    int buf_size = TAG_SIZE + 1 + 2 + 2;
+    // 1 for single space 2 for "OK", 1 for end single space, and 1 for null terminator
+    int buf_size = TAG_SIZE + 1 + 2 + 1 + 1;
     char *response = (char*)malloc(buf_size);
-    int byte_received = recv(*client_socket_fd, response, buf_size, 0);
 
-    // Fatal response
-    if (response[0] == '*') {
-        perror("Login failure\n");
+    // Read from the server for response
+    int recv_len;
+    recv_len = recv(*client_socket_fd, response, buf_size, 0);
+    reponse[recv_len] = '\0'; // Null terminate the received message
+    if (recv_len == -1) {
+        perror("recv");
+        fprintf(stderr, "Failed to receive response\n");
         return -1;
     }
 
-    // Response done
-    if (strncmp(LOGIN_TAG, response, TAG_SIZE) == 0) {
-        return 0;
+    // If the response does not start with the tag, then it is a fatal response
+    if (strncmp(response, LOGIN_TAG, TAG_SIZE) != 0) {
+        perror("login");
+        fprintf(stderr, "Failed to login\n");
+        return -1;
     }
 
-    // If neither fatal nor done, something else is causing login to fail
-    return -1;
+    return 0;
 }
 
 // Helper function to construct select folder message
@@ -112,7 +117,8 @@ int select_folder(const int *client_socket_fd, char *folder) {
                          strlen(select_cmd), 0);
 
     if (byte_send == -1) {
-        perror("send failure at selecting folder");
+        perror("send");
+        fprintf(stderr, "Failed to send select folder command\n");
         return -1;
     }
 
@@ -122,20 +128,36 @@ int select_folder(const int *client_socket_fd, char *folder) {
 
 int verify_folder_selection(const int *client_socket_fd) {
     // Receive response from server
-    int buf_size = 1 + TAG_SIZE + 2 + 2;
-    char *response = (char*)malloc(buf_size);
-    int byte_received = recv(*client_socket_fd, response, buf_size, 0);
+    char response[MAX_DATA_SIZE];
 
-    // Set up expected response for comparison
-    char* expected_response = (char*) malloc(6);
-    expected_response[0] = '*';
-    expected_response = strcat(expected_response, SELECT_TAG);
-    expected_response = strcat(expected_response, "OK");
-
-    // Compare expected and actual response until the end of "OK" string
-    if (strncmp(expected_response, response, 5) == 0) {
-        return 0;
+    int recv_len;
+    recv_len = recv(*client_socket_fd, response, MAX_DATA_SIZE, 0); // Read all the response
+    if (recv_len == -1) {
+        perror("recv");
+        fprintf(stderr, "Failed to receive response\n");
+        return -1;
     }
-    perror("Folder not found");
-    return -1;
+
+    if (recv_len == 0) {
+        perror("recv");
+        fprintf(stderr, "Connection closed\n");
+        return -1;
+    }
+
+    response[recv_len] = '\0'; // Null terminate the received message
+
+    // Expected response
+    char *ok_msg = (char*)malloc(TAG_SIZE + 3 + 1);
+    ok_msg[0] = '*';
+    ok_msg = strcat(ok_msg, SELECT_TAG);
+    ok_msg = strcat(ok_msg, " OK\0");
+
+    // Compare server response to expected response
+    if (strncmp(response, ok_msg, strlen(ok_msg)) != 0) {
+        perror("select");
+        fprintf(stderr, "Folder not found\n");
+        return -1;
+    } 
+
+    return 0;
 }
