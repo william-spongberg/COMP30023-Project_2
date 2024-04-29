@@ -68,7 +68,7 @@ int verify_login(const int *client_socket_fd) {
     // Read from the server for response
     int recv_len;
     recv_len = recv(*client_socket_fd, response, buf_size, 0);
-    reponse[recv_len] = '\0'; // Null terminate the received message
+    response[recv_len] = '\0'; // Null terminate the received message
     if (recv_len == -1) {
         perror("recv");
         fprintf(stderr, "Failed to receive response\n");
