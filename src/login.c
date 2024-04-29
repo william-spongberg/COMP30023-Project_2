@@ -12,17 +12,15 @@
 #define SPACE_COUNT 3
 #define EOL_SIZE 2
 
-
-
 // Helper function to construct message in appropriate format
 char *construct_message(char *username, char *password) {
     // Allocate memory for the login command
     int username_length = strlen(username);
     int password_length = strlen(password);
-    char *login_command = (char*)malloc(TAG_SIZE + LOGIN_COMMAND_SIZE +
-                                         username_length + password_length +
-                                         SPACE_COUNT + EOL_SIZE + 1);
-    if(login_command == NULL) {
+    char *login_command =
+        (char *)malloc(TAG_SIZE + LOGIN_COMMAND_SIZE + username_length +
+                       password_length + SPACE_COUNT + EOL_SIZE + 1);
+    if (login_command == NULL) {
         perror("malloc");
         exit(1);
     }
@@ -41,11 +39,11 @@ char *construct_message(char *username, char *password) {
 
 // Implement the logon function
 int login(const int *client_socket_fd, char *username, char *password) {
-    char* login_command = construct_message(username, password);
+    char *login_command = construct_message(username, password);
 
     // Send the login command to the server already connected via TCP
-    int byte_send = send(*client_socket_fd, login_command,
-                         strlen(login_command), 0);
+    int byte_send =
+        send(*client_socket_fd, login_command, strlen(login_command), 0);
     if (byte_send == -1) {
         perror("send");
         return -1;
