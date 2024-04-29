@@ -5,11 +5,11 @@
 #ifndef PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
 #define PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
 
-#include <sys/socket.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 /** A function to send a message to the server to request a logon, return

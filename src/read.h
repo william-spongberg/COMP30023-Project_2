@@ -2,12 +2,12 @@
 #define READ_H
 
 #include <getopt.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void read(int argc, char *argv[], const char *hostname,
-          const char *password, const char *folder, int *message_num,
-          char *command, char *server_name);
+void read_command_line(int argc, char *argv[], char **username, char **password,
+                       char **folder, char **message_num, char **command,
+                       char **server_name);
 
 #endif
