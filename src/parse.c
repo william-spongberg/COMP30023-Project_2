@@ -12,6 +12,7 @@ void parse_headers(char *buffer) {
     printf("To: %s\n", to);
     printf("Date: %s\n", date);
     printf("Subject: %s\n", subject);
+    printf("\n");
 
     // free memory
     free(from);
