@@ -2,7 +2,7 @@
 // Created by liang on 4/27/2024.
 //
 
-#ifndef PROJ2_LIANZHANG2_WSPONGBERG_PARSE_H
-#define PROJ2_LIANZHANG2_WSPONGBERG_PARSE_H
+#ifndef PARSE_H
+#define PARSE_H
 
-#endif // PROJ2_LIANZHANG2_WSPONGBERG_PARSE_H
+#endif

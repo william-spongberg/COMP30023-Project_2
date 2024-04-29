@@ -2,7 +2,7 @@
 // Created by liang on 4/27/2024.
 //
 
-#ifndef PROJ2_LIANZHANG2_WSPONGBERG_MIME_H
-#define PROJ2_LIANZHANG2_WSPONGBERG_MIME_H
+#ifndef MIME_H
+#define MIME_H
 
-#endif // PROJ2_LIANZHANG2_WSPONGBERG_MIME_H
+#endif

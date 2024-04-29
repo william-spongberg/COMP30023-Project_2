@@ -35,8 +35,7 @@ int main(int argc, char *argv[]) {
         // check if hostname is valid
         if (status == 0) {
             // create a socket
-            connfd = socket(rp->ai_family, rp->ai_socktype,
-                            rp->ai_protocol);
+            connfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
             if (connfd == -1) {
                 perror("socket");
                 continue;
