@@ -1,7 +1,9 @@
 #include "read.h"
 #include <assert.h>
 
-void read(int argc, char *argv[], char *hostname, char *password, char *folder, int *message_num, char *command, char *server_name)
+void read(int argc, char *argv[], const char *hostname,
+          const char *password, const char *folder, int *message_num,
+          char *command, char *server_name)
 {
     int opt;
     while (opt = getopt(argc, argv, "h:p:f:m:c:s:"), opt != -1) {
@@ -11,7 +13,8 @@ void read(int argc, char *argv[], char *hostname, char *password, char *folder, 
             assert(hostname != NULL);
             break;
         case 'p':
-            strcpy(password, optarg);
+            password = strdup(optarg);
+            assert(password != NULL);
             break;
         case 'f':
             folder = strdup(optarg);
@@ -27,7 +30,9 @@ void read(int argc, char *argv[], char *hostname, char *password, char *folder, 
 
             break;
         default:
-            fprintf(stderr, "Usage: %s -h <hostname> -p <password> -f <folder> -n <message_num> -c <command> -s <server_name>\n", argv[0]);
+            fprintf(stderr, "Usage: %s -h <hostname> -p <password> "
+                            "-f <folder> -n <message_num> -c <command> "
+                            "-s <server_name>\n", argv[0]);
             exit(EXIT_FAILURE);
         }
     }
