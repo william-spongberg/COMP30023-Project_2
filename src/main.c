@@ -7,6 +7,8 @@
 
 #define _POSIX_C_SOURCE 200112L
 
+#define PORT "143" // IMAP port
+
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <hostname>\n", argv[0]);
@@ -27,13 +29,13 @@ int main(int argc, char *argv[]) {
     hints.ai_family = AF_UNSPEC;     // IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP socket
 
-    // connecting to port 143 (IMAP)
-    int status = getaddrinfo(hostname, "143", &hints, &result);
+    int status = getaddrinfo(hostname, PORT, &hints, &result);
 
     // try to connect to each address in the list
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         // check if hostname is valid
         if (status == 0) {
+
             // create a socket
             connfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
             if (connfd == -1) {
@@ -55,16 +57,30 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "getnameinfo error: %s\n", gai_strerror(status));
         }
     }
-
     if (rp == NULL) {
         fprintf(stderr, "Could not connect to %s\n", hostname);
         exit(EXIT_FAILURE);
     }
+    freeaddrinfo(result);
 
-    // close socket and free addrinfo
+    // login to server
+    write(connfd, "a LOGIN test@comp30023 pass\n", 29);
+
+    // read response from server
+    char buffer[1024];
+    read(connfd, buffer, 1024);
+    printf("%s\n", buffer);
+
+    // access "Test" folder
+    write(connfd, "b SELECT Test\n", 15);
+
+    // read response from server
+    read(connfd, buffer, 1024);
+    printf("%s\n", buffer);
+
+    // close socket
     if (connfd != -1) {
         close(connfd);
     }
-    freeaddrinfo(result);
     return 0;
 }
