@@ -145,7 +145,7 @@ int verify_folder_selection(const int *client_socket_fd, int *msg_num) {
         return -1;
     } 
 
-    // TODO: if msg_num from the command is not found, it is assigned to the last email added, 
+    // if msg_num from the command is not found, it is assigned to the last email added, 
     // which is the number of email in the mailbox, which is received here
     if (msg_num == NULL) {
         char *num_msg = strstr(response, "EXISTS");
