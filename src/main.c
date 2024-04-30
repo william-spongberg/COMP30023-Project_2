@@ -66,6 +66,11 @@ int main(int argc, char *argv[]) {
     check_memory(tag);
     get_tag(tag, MAX_TAG_SIZE);
 
+
+    /**
+     * TODO: Proposed: refactor this to the login module
+     * which logs in the user and selects the folder.
+    */
     // login command
     char *login = create_command(3, LOGIN, username, password);
     send_command(&tag, login, &buffer, connfd, stream);
@@ -84,6 +89,12 @@ int main(int argc, char *argv[]) {
     memset(buffer, 0, MAX_DATA_SIZE);
     free(select);
 
+
+    /**
+     * TODO: Propsoed: the suggestion written for the create_command function
+     * below would eliminates the need for a giant if else block.
+    */
+   
     // commands
     if (strcmp(command, "retrieve") == 0) {
         printf("|Retrieve command|\n");
@@ -133,6 +144,11 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+/**
+ * TODO: Proposed: refactor this to the mime module, 
+ * and let the mime module handle the parsing of the mime headers
+ * as well as print the contents of the message.
+*/
 void parse_mime(char *buffer) {
     // TODO: error handling
     // match mime boundary
@@ -211,6 +227,10 @@ void free_memory(int connfd, FILE *stream, int num_ptrs, ...) {
     }
 }
 
+/**
+ * TODO: Proposed: similar to suggestions in create_command, let each module
+ * send its own respective command, and receive the response. 
+*/
 char *create_command(int num_strs, ...) {
     va_list args;
     va_start(args, num_strs);
@@ -310,6 +330,12 @@ void get_tag(char *buffer, size_t size) {
     }
 }
 
+/**
+ * TODO: Proposed: instead of sending command in main, let each module send its
+ * own respective command, and receive the response. This way, the main function
+ * will only be responsible for setting up the connection, determine what command
+ * is requested by tasks and close the connection.
+ */ 
 void send_command(char **tag, char *command, char **buffer, int connfd,
                   FILE *stream) {
     // initialise command
