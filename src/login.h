@@ -16,6 +16,6 @@
  * RETURN: 0 if the logon is successful, -1 if the logon is unsuccessful
  */
 int login(const int *client_socket_fd, char *username, char *password);
-int select_folder(const int *client_socket_fd, char *folder);
+int select_folder(const int *client_socket_fd, char *folder, int *msg_num);
 
 #endif // PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H

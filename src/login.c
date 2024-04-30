@@ -111,7 +111,7 @@ char *construct_select_msg(char *folder) {
     return msg;
 }
 
-int verify_folder_selection(const int *client_socket_fd) {
+int verify_folder_selection(const int *client_socket_fd, int *msg_num) {
     // Receive response from server
     char response[MAX_DATA_SIZE];
 
@@ -145,13 +145,25 @@ int verify_folder_selection(const int *client_socket_fd) {
         return -1;
     } 
 
-    // TODO: if msg_num from the command is not found, it is assigned to the last email added, which is the number of email in the mailbox, which is received here
+    // TODO: if msg_num from the command is not found, it is assigned to the last email added, 
+    // which is the number of email in the mailbox, which is received here
+    if (msg_num == NULL) {
+        char *num_msg = strstr(response, "EXISTS");
+        if (num_msg == NULL) {
+            perror("select");
+            fprintf(stderr, "Failed to find number of messages\n");
+            return -1;
+        }
+
+        num_msg += strlen("EXISTS") + 1;
+        *msg_num = atoi(num_msg);
+    }
 
     return 0;
 }
 
 
-int select_folder(const int *client_socket_fd, char *folder) {
+int select_folder(const int *client_socket_fd, char *folder, int *msg_num) {
     char *select_cmd = construct_select_msg(folder);
 
     int byte_send = send(*client_socket_fd, select_cmd, strlen(select_cmd), 0);
@@ -162,7 +174,7 @@ int select_folder(const int *client_socket_fd, char *folder) {
         return -1;
     }
 
-    verify_folder_selection(client_socket_fd);
+    verify_folder_selection(client_socket_fd, msg_num);
 
     free(select_cmd);
     return 0;
