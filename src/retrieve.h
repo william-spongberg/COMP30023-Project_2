@@ -24,6 +24,7 @@
  * Return: int - 0 if the email is successfully retrieved, -1 if the email is not successfully retrieved
 */
 
-int retrieve_email(const int *client_socket_fd, char *msg_num);
+int retrieve_email(const int *client_socket_fd, int  *msg_num);
+char *construct_retrieve_cmd(const int *msg_num_str);
 
 #endif

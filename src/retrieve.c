@@ -1,18 +1,23 @@
 #include "retrieve.h"
-
+#define MAX_DATA_SIZE 4096
 
 
 char *construct_retrieve_cmd(const int *msg_num) {
+
+    char msg_num_str[10]; // Assume maximum number of email is 10 digits
+    sprintf(msg_num_str, "%d", *msg_num);
     
     int msg_size = RETRIEVE_TAG_SIZE + SPACE + RETRIEVE_CMD_SIZE + SPACE + 
-                    strlen(itoa(*msg_num)) + SPACE + BOBY_PEEK_SIZE + EOL_SIZE;
+                    strlen(msg_num_str) + SPACE + BOBY_PEEK_SIZE + EOL_SIZE;
+    
+    
 
     char *msg = (char *)malloc(msg_size);
     msg = memcpy(msg, RETRIEVE_TAG, RETRIEVE_TAG_SIZE);
     strcat(msg, " ");
     strcat(msg, RETRIEVE_CMD);
     strcat(msg, " ");
-    strcat(msg, itoa(*msg_num));
+    strcat(msg, msg_num_str);
     strcat(msg, " ");
     strcat(msg, BOBY_PEEK);
     strcat(msg, "\r\n");
@@ -21,7 +26,7 @@ char *construct_retrieve_cmd(const int *msg_num) {
 
 
 
-int retrieve(const int *client_socket_fd, int *msg_num) {
+int retrieve_email(const int *client_socket_fd, int *msg_num) {
     if (msg_num == NULL) {
         // Retrieve the last email added
 

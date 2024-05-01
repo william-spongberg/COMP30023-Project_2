@@ -72,22 +72,25 @@ int main(int argc, char *argv[]) {
      * which logs in the user and selects the folder.
     */
     // login command
-    char *login = create_command(3, LOGIN, username, password);
-    send_command(&tag, login, &buffer, connfd, stream);
-    // print response
-    printf("Received: %s\n", buffer);
-    printf("\n");
-    memset(buffer, 0, MAX_DATA_SIZE);
-    free(login);
+    // char *login = create_command(3, LOGIN, username, password);
+    // send_command(&tag, login, &buffer, connfd, stream);
+    // // print response
+    // printf("Received: %s\n", buffer);
+    // printf("\n");
+    // memset(buffer, 0, MAX_DATA_SIZE);
+    // free(login);
 
-    // select command
-    char *select = create_command(2, SELECT, folder);
-    send_command(&tag, select, &buffer, connfd, stream);
-    // print response
-    printf("Received: %s\n", buffer);
-    printf("\n");
-    memset(buffer, 0, MAX_DATA_SIZE);
-    free(select);
+    // // select command
+    // char *select = create_command(2, SELECT, folder);
+    // send_command(&tag, select, &buffer, connfd, stream);
+    // // print response
+    // printf("Received: %s\n", buffer);
+    // printf("\n");
+    // memset(buffer, 0, MAX_DATA_SIZE);
+    // free(select);
+
+    login(&connfd, username, password);
+    select_folder(&connfd, folder, &int_message_num);
 
 
     /**

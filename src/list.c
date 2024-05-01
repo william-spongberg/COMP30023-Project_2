@@ -52,7 +52,7 @@ int is_empty(const int *client_socket_fd, char *folder_name) {
     }
 
     num_msg += strlen("MESSAGES") + 1;
-    int num_messages = atoi(*num_msg);
+    int num_messages = atoi(num_msg);
     free(cmd);
     if (num_messages == 0) {
         return 1;
@@ -73,7 +73,6 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
 
     // Check if the mailbox is empty
     if (is_empty(client_socket_fd, folder_name) == 1) {
-        printf("");
         free(cmd);
         return 1;
     }

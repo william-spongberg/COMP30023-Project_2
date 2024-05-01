@@ -1,4 +1,5 @@
 #include "mime.h"
+#define MAX_DATA_SIZE 4096
 
 int fetch_email_body(const int *clinet_socket_fd, const int msg_num) {
     // fetch email body
@@ -32,16 +33,16 @@ int get_mime(const int *clinet_socket_fd, const int msg_num) {
 
     // Receive response from server
     char response[MAX_DATA_SIZE];
-    int recv_len;
-    recv_len = recv(*clinet_socket_fd, response, MAX_DATA_SIZE, 0); // Read all the response
+
+    int recv_len = recv(*clinet_socket_fd, response, MAX_DATA_SIZE, 0); // Read all the response
 
     // Setup required content type for search
     char *content_type = "Content-Type: text/plain; charset=UTF-8";
-    char content_transfer_encoding[][] = {"quoted-printable", "7bit", "8bit"};
+    char *content_transfer_encoding[] = {"quoted-printable", "7bit", "8bit"};
 
     // Boundary to separate the body parts
     char *boundary_header = "boundary=";
-    char *boundary_ptr = strstr(response, boundary);
+    char *boundary_ptr = strstr(response, boundary_header);
     // Extract the boundary value
     char *boundary_start = boundary_ptr + strlen(boundary_header) + 1;
     char *boundary_end = strchr(boundary_start, '\"');
@@ -72,7 +73,6 @@ int get_mime(const int *clinet_socket_fd, const int msg_num) {
 
                 // Free the allocated memory
                 free(content_type_ptr);
-                free(boundary);
                 free(body);
                 return 0;
             }
@@ -84,7 +84,6 @@ int get_mime(const int *clinet_socket_fd, const int msg_num) {
 
     // Free the allocated memory
     free(content_type_ptr);
-    free(boundary);
 
     // No required content type with the desired charset and transferencoding found
     return -1;
