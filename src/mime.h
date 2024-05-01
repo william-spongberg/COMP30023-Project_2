@@ -7,7 +7,6 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
 #include "retrieve.h"
 
 #define MIME_TAG "A04"
@@ -30,5 +29,5 @@
     // Charset is UTF - 8
     // Content transfer encoding quoted-printable | 7bit | 8bit
 
-int get_mime(const int *client_socket_fd, char *msg_num);
+int get_mime(const int *client_socket_fd, const int msg_num);
 #endif
