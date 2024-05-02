@@ -27,6 +27,8 @@ char *construct_login_message(char *username, char *password) {
         exit(1);
     }
 
+    printf("Login command: %s\n", login_command);
+
     // Construct the login command
     login_command = memcpy(login_command, LOGIN_TAG, TAG_SIZE);
     strcat(login_command, " ");

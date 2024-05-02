@@ -285,6 +285,13 @@ int setup_connection(char *hostname) {
 
     status = getaddrinfo(hostname, IMAP_PORT, &hints, &result);
 
+    // printf("addr info status: %d\n", status);
+
+    if (status != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+        exit(1);
+    }
+
     // try to connect to each address in the list
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         // check if hostname is valid
