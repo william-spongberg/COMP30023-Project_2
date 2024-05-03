@@ -1,11 +1,5 @@
 #include "list.h"
 
-#define LIST_CMD "FETCH 1:* (BODY.PEEK[HEADER.FIELDS (SUBJECT)])\r\n"
-#define LIST_CMD_LEN strlen(LIST_CMD)
-#define MAX_DATA_SIZE 4096
-
-#define LIST_TAG "A03"
-
 // Helper function to check if the mailbox is empty
 int is_empty(const int *client_socket_fd, char *folder_name) {
     // Command should be "STATUS <folder_name> (MESSAGES)"
