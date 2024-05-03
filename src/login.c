@@ -161,6 +161,9 @@ int verify_folder_selection(const int *client_socket_fd, int *msg_num) {
         *msg_num = atoi(num_msg);
     }
 
+    // free memory
+    free(ok_msg);
+
     return 0;
 }
 

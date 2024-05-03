@@ -1,5 +1,5 @@
-#ifndef PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
-#define PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include <netdb.h>
 #include <stdio.h>
