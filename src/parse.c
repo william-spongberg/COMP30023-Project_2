@@ -1,11 +1,16 @@
 #include "parse.h"
+#include "retrieve.h"
 
-void parse_headers(char *buffer) {
+void parse_headers(char *str_message_num, char **tag, char **buffer,
+                     int connfd, FILE *stream) {
+    // retrieve headers
+    retrieve_headers(str_message_num, tag, buffer, connfd, stream);
+
     // get headers from first occurence of header title
-    char *from = get_message(strstr(buffer, "From: "));
-    char *to = get_message(strstr(buffer, "To: "));
-    char *date = get_message(strstr(buffer, "Date: "));
-    char *subject = get_message(strstr(buffer, "Subject: "));
+    char *from = get_message(strstr(*buffer, "From: "));
+    char *to = get_message(strstr(*buffer, "To: "));
+    char *date = get_message(strstr(*buffer, "Date: "));
+    char *subject = get_message(strstr(*buffer, "Subject: "));
 
     // print headers
     printf("From: %s\n", from);
