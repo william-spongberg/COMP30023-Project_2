@@ -40,12 +40,27 @@ char *create_command(int num_strs, ...) {
 
 void send_command(char *command, char **tag, char **buffer, int connfd,
                   FILE *stream) {
-    // initialise command
+    // initialise commands
     get_num_tag(*tag, MAX_TAG_SIZE);
     char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 2);
     check_memory(total_command);
+    // ok command
+    char *ok_command = malloc(strlen(*tag) + 4);
+    check_memory(ok_command);
+    strcpy(ok_command, *tag);
+    strcat(ok_command, " OK");
+    // no command
+    char *no_command = malloc(strlen(*tag) + 4);
+    check_memory(no_command);
+    strcpy(no_command, *tag);
+    strcat(no_command, " NO");
+    // bad command
+    char *bad_command = malloc(strlen(*tag) + 5);
+    check_memory(bad_command);
+    strcpy(bad_command, *tag);
+    strcat(bad_command, " BAD");
 
-    // create command
+    // create total command
     strcpy(total_command, *tag);
     strcat(total_command, " ");
     strcat(total_command, command);
@@ -59,32 +74,20 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     fgets(line, MAX_LINE_SIZE, stream);
     strcat(*buffer, line);
 
+    // check if command was successful
+    if (strncmp(*buffer, no_command, strlen(no_command)) == 0 || 
+        strncmp(*buffer, bad_command, strlen(bad_command)) == 0) {
+        fprintf(stderr, "Failed to send command\n");
+        fprintf(stderr, "Received: %s\n", *buffer);
+        exit(3);
+    }
+
     // check if server is ready
     if (strncmp(*buffer, "* ", 2) != 0) {
         fprintf(stderr, "Server not ready\n");
         fprintf(stderr, "Received: %s\n", *buffer);
         exit(3);
     }
-
-    fprintf(stderr, "Received: %s\n", *buffer);
-
-    // ok command
-    char *ok_command = malloc(strlen(*tag) + 4);
-    check_memory(ok_command);
-    strcpy(ok_command, *tag);
-    strcat(ok_command, " OK");
-
-    // no command
-    char *no_command = malloc(strlen(*tag) + 4);
-    check_memory(no_command);
-    strcpy(no_command, *tag);
-    strcat(no_command, " NO");
-
-    // bad command
-    char *bad_command = malloc(strlen(*tag) + 5);
-    check_memory(bad_command);
-    strcpy(bad_command, *tag);
-    strcat(bad_command, " BAD");
 
     // receive response from server
     while (strncmp(line, ok_command, strlen(ok_command)) != 0 && 
@@ -100,6 +103,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
         //printf("%s", line);
     }
 
+    // check if command was successful
     if (strncmp(line, no_command, strlen(no_command)) == 0 || 
         strncmp(line, bad_command, strlen(bad_command)) == 0) {
         fprintf(stderr, "Failed to send command\n");
