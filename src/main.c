@@ -9,8 +9,6 @@
 #include "retrieve.h"
 
 #define FETCH "FETCH"
-#define BODY "BODY.PEEK[]"
-#define BODY_HEADERS "BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]"
 
 int main(int argc, char *argv[]) {
     char *username = NULL;
