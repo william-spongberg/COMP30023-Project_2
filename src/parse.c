@@ -1,8 +1,8 @@
 #include "parse.h"
 #include "retrieve.h"
 
-void parse_headers(char *str_message_num, char **tag, char **buffer,
-                     int connfd, FILE *stream) {
+void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
+                   FILE *stream) {
     // retrieve headers
     retrieve_headers(str_message_num, tag, buffer, connfd, stream);
 

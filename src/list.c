@@ -3,8 +3,8 @@
 // Helper function to check if the mailbox is empty
 int is_empty(const int *client_socket_fd, char *folder_name) {
     // Command should be "STATUS <folder_name> (MESSAGES)"
-    char *cmd = malloc(strlen("STATUS ") + strlen(folder_name) + 
-                            strlen(" (MESSAGES)\r\n") + 1);
+    char *cmd = malloc(strlen("STATUS ") + strlen(folder_name) +
+                       strlen(" (MESSAGES)\r\n") + 1);
     if (cmd == NULL) {
         perror("malloc");
         return -1;
@@ -53,7 +53,6 @@ int is_empty(const int *client_socket_fd, char *folder_name) {
     }
 
     return 0;
-
 }
 
 int list_emails(const int *client_socket_fd, char *folder_name) {
@@ -70,7 +69,6 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
         free(cmd);
         return 1;
     }
-
 
     // Send the command to the server
     if (send(*client_socket_fd, cmd, LIST_CMD_LEN, 0) == -1) {
@@ -101,5 +99,4 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
     printf("%s\n", content);
 
     return 0;
-
 }

@@ -3,8 +3,8 @@
 #include "memory.h"
 #include "tag.h"
 
-void login(char *username, char *password, char **tag, char **buffer, int connfd,
-          FILE *stream) {
+void login(char *username, char *password, char **tag, char **buffer,
+           int connfd, FILE *stream) {
     // login command
     char *login = create_command(3, LOGIN, username, password);
     send_command(login, tag, buffer, connfd, stream);
@@ -26,7 +26,7 @@ void login(char *username, char *password, char **tag, char **buffer, int connfd
 }
 
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
-                  FILE *stream) {
+                   FILE *stream) {
     // select command
     char *select = create_command(2, SELECT, folder);
     send_command(select, tag, buffer, connfd, stream);
@@ -57,8 +57,8 @@ int verify_login(char *tag, char *buffer) {
         return -1;
     }
 
-    // // If the response does not start with the tag, then it is a fatal response
-    // if (strncmp(buffer, tag, strlen(tag)) != 0) {
+    // // If the response does not start with the tag, then it is a fatal
+    // response if (strncmp(buffer, tag, strlen(tag)) != 0) {
     //     perror("login");
     //     fprintf(stderr, "Failed to login\n");
     //     return -1;

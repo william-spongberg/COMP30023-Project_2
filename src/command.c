@@ -75,7 +75,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     strcat(*buffer, line);
 
     // check if command was successful
-    if (strncmp(*buffer, no_command, strlen(no_command)) == 0 || 
+    if (strncmp(*buffer, no_command, strlen(no_command)) == 0 ||
         strncmp(*buffer, bad_command, strlen(bad_command)) == 0) {
         fprintf(stderr, "Failed to send command\n");
         fprintf(stderr, "Received: %s\n", *buffer);
@@ -90,8 +90,8 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     }
 
     // receive response from server
-    while (strncmp(line, ok_command, strlen(ok_command)) != 0 && 
-           strncmp(line, no_command, strlen(no_command)) != 0 && 
+    while (strncmp(line, ok_command, strlen(ok_command)) != 0 &&
+           strncmp(line, no_command, strlen(no_command)) != 0 &&
            strncmp(line, bad_command, strlen(bad_command)) != 0) {
         fgets(line, MAX_LINE_SIZE, stream);
         // realloc buffer if needed
@@ -100,11 +100,11 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
             check_memory(*buffer);
         }
         strcat(*buffer, line);
-        //printf("%s", line);
+        // printf("%s", line);
     }
 
     // check if command was successful
-    if (strncmp(line, no_command, strlen(no_command)) == 0 || 
+    if (strncmp(line, no_command, strlen(no_command)) == 0 ||
         strncmp(line, bad_command, strlen(bad_command)) == 0) {
         fprintf(stderr, "Failed to send command\n");
         fprintf(stderr, "Received: %s\n", *buffer);

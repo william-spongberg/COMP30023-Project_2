@@ -1,10 +1,10 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include <unistd.h>
 
 #define MAX_DATA_SIZE 4096

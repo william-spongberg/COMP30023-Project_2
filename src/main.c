@@ -5,8 +5,8 @@
 #include "mime.h"
 #include "parse.h"
 #include "read.h"
-#include "tag.h"
 #include "retrieve.h"
+#include "tag.h"
 
 #define FETCH "FETCH"
 

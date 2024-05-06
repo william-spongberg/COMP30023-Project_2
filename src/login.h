@@ -6,10 +6,10 @@
 #define LOGIN "LOGIN"
 #define SELECT "SELECT"
 
-void login(char *username, char *password, char **tag, char **buffer, int connfd,
-          FILE *stream);
+void login(char *username, char *password, char **tag, char **buffer,
+           int connfd, FILE *stream);
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
-                  FILE *stream);
+                   FILE *stream);
 int verify_login(char *tag, char *buffer);
 int verify_folder_selection(char *buffer, int *msg_num);
 

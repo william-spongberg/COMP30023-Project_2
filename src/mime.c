@@ -99,7 +99,7 @@ void parse_mime(char *buffer) {
     strncpy(encoding, start, end - start);
     encoding[end - start] = '\0';
     printf("Content-Transfer-Encoding: %s\n", encoding);
-    
+
     start = strstr(hdr, "Content-Type: ");
     start = strchr(start, ' ') + 1;
     end = strchr(start, '\r');
