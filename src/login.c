@@ -13,12 +13,13 @@ void login(char *username, char *password, char **tag, char **buffer,
     if (verify_login(*tag, *buffer) == -1) {
         perror("login");
         fprintf(stderr, "Login failure\n");
+        printf("Login failed\n");
         exit(3);
     }
 
-    // print response
-    printf("Received:\n%s\n", *buffer);
-    printf("\n");
+    // print response for debugging
+    // printf("Received:\n%s\n", *buffer);
+    // printf("\n");
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
@@ -27,8 +28,13 @@ void login(char *username, char *password, char **tag, char **buffer,
 
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
+    // put quotes around folder name
+    char *quoted_folder = malloc(strlen(folder) + 3);
+    check_memory(quoted_folder);
+    sprintf(quoted_folder, "\"%s\"", folder);
+
     // select command
-    char *select = create_command(2, SELECT, folder);
+    char *select = create_command(2, SELECT, quoted_folder);
     send_command(select, tag, buffer, connfd, stream);
 
     // verify that folder selection was successful
@@ -39,9 +45,9 @@ void select_folder(char *folder, char **tag, char **buffer, int connfd,
         exit(3);
     }
 
-    // print response
-    printf("Received:\n%s\n", *buffer);
-    printf("\n");
+    // print response for debugging
+    // printf("Received:\n%s\n", *buffer);
+    // printf("\n");
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
@@ -56,13 +62,6 @@ int verify_login(char *tag, char *buffer) {
         fprintf(stderr, "Failed to login\n");
         return -1;
     }
-
-    // // If the response does not start with the tag, then it is a fatal
-    // response if (strncmp(buffer, tag, strlen(tag)) != 0) {
-    //     perror("login");
-    //     fprintf(stderr, "Failed to login\n");
-    //     return -1;
-    // }
 
     return 0;
 }

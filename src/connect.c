@@ -40,7 +40,7 @@ int setup_connection(char *hostname) {
             }
 
             // successfully connected
-            printf("Connected to %s\n\n", hostname);
+            // printf("Connected to %s\n\n", hostname);
             break;
         } else {
             fprintf(stderr, "getnameinfo error: %s\n", gai_strerror(status));
