@@ -28,8 +28,13 @@ void login(char *username, char *password, char **tag, char **buffer,
 
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
+    // put quotes around folder name
+    char *quoted_folder = malloc(strlen(folder) + 3);
+    check_memory(quoted_folder);
+    sprintf(quoted_folder, "\"%s\"", folder);
+
     // select command
-    char *select = create_command(2, SELECT, folder);
+    char *select = create_command(2, SELECT, quoted_folder);
     send_command(select, tag, buffer, connfd, stream);
 
     // verify that folder selection was successful
