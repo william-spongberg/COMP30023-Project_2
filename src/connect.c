@@ -16,7 +16,7 @@ int setup_connection(char *hostname) {
 
     if (status != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-        exit(1);
+        exit(2);
     }
 
     // try to connect to each address in the list
