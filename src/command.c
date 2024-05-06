@@ -67,7 +67,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
 
     // send command to server
     write(connfd, total_command, strlen(total_command));
-    printf("Sent:\n%s\n", total_command);
+    // printf("Sent:\n%s\n", total_command);
 
     // receive first response from server
     char line[MAX_LINE_SIZE];
@@ -99,16 +99,28 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
             *buffer = realloc(*buffer, strlen(*buffer) * REALLOC_SIZE + 1);
             check_memory(*buffer);
         }
+        // DO NOT cat buffer if line is the status of the command
         strcat(*buffer, line);
         // printf("%s", line);
     }
 
-    // check if command was successful
+    // check if task was successful
     if (strncmp(line, no_command, strlen(no_command)) == 0 ||
         strncmp(line, bad_command, strlen(bad_command)) == 0) {
-        fprintf(stderr, "Failed to send command\n");
-        fprintf(stderr, "Received: %s\n", *buffer);
-        exit(3);
+
+        if (strstr(command, "FETCH") != NULL) {
+            fprintf(stderr, "Failed to retrieve message\n");
+            fprintf(stderr, "Received: %s\n", *buffer);
+            exit(3);
+        } else if (strstr(command, "LOGIN") != NULL) {
+            printf("Login failure\n");
+            fprintf(stderr, "Received: %s\n", *buffer);
+            exit(3);
+        } else if (strstr(command, "SELECT") != NULL) {
+            fprintf(stderr, "Failed to select folder\n");
+            fprintf(stderr, "Received: %s\n", *buffer);
+            exit(3);
+        }
     }
 
     // free memory

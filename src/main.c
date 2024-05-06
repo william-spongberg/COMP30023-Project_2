@@ -25,12 +25,12 @@ int main(int argc, char *argv[]) {
     int_message_num = atoi(str_message_num);
 
     // print command line arguments for debugging
-    printf("\nUsername: %s\n", username);
-    printf("Password: %s\n", password);
-    printf("Folder: %s\n", folder);
-    printf("Message number: %d\n", int_message_num);
-    printf("Command: %s\n", command);
-    printf("Hostname: %s\n\n", hostname);
+    // printf("\nUsername: %s\n", username);
+    // printf("Password: %s\n", password);
+    // printf("Folder: %s\n", folder);
+    // printf("Message number: %d\n", int_message_num);
+    // printf("Command: %s\n", command);
+    // printf("Hostname: %s\n\n", hostname);
 
     // setup connection
     int connfd = setup_connection(hostname);
@@ -59,11 +59,11 @@ int main(int argc, char *argv[]) {
 
     // commands
     if (strcmp(command, "retrieve") == 0) {
-        printf("[retrieve]\n");
+        // printf("[retrieve]\n");
         retrieve_body(str_message_num, &tag, &buffer, connfd, stream);
         // print response
         printf("Received:\n%s\n", buffer);
-        printf("\n");
+        // printf("\n");
         memset(buffer, 0, MAX_DATA_SIZE);
     } else if (strcmp(command, "parse") == 0) {
         printf("[parse]\n");
