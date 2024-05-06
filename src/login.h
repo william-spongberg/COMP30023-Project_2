@@ -1,21 +1,16 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
-#include <netdb.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
-/** A function to send a message to the server to request a logon, return
- * 0 if the logon is successful, -1 if the logon is unsuccessful.
- * INPUT: socket_fd - the client socket file descriptor
- *       username - the username to logon with
- *       password - the password to logon with
- * RETURN: 0 if the logon is successful, -1 if the logon is unsuccessful
- */
-int login(const int *client_socket_fd, char *username, char *password);
-int select_folder(const int *client_socket_fd, char *folder, int *msg_num);
+#define LOGIN "LOGIN"
+#define SELECT "SELECT"
+
+int login(char *username, char *password, char **tag, char **buffer, int connfd,
+          FILE *stream);
+int select_folder(char *folder, char **tag, char **buffer, int connfd,
+                  FILE *stream);
+int verify_login(char *tag, char *buffer);
+int verify_folder_selection(char *buffer, int *msg_num);
 
 #endif // PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
