@@ -43,6 +43,9 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     // initialise command
     get_num_tag(*tag, MAX_TAG_SIZE);
     char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 2);
+    check_memory(total_command);
+
+    // create command
     strcpy(total_command, *tag);
     strcat(total_command, " ");
     strcat(total_command, command);
@@ -63,25 +66,48 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
         exit(3);
     }
 
-    // confirm command
-    char *confirm_command = malloc(strlen(*tag) + 4);
-    strcpy(confirm_command, *tag);
-    strcat(confirm_command, " OK");
-    while (strncmp(line, confirm_command, strlen(confirm_command)) != 0) {
+    fprintf(stderr, "Received: %s\n", *buffer);
+
+    // ok command
+    char *ok_command = malloc(strlen(*tag) + 4);
+    check_memory(ok_command);
+    strcpy(ok_command, *tag);
+    strcat(ok_command, " OK");
+
+    // no command
+    char *no_command = malloc(strlen(*tag) + 4);
+    check_memory(no_command);
+    strcpy(no_command, *tag);
+    strcat(no_command, " NO");
+
+    // bad command
+    char *bad_command = malloc(strlen(*tag) + 5);
+    check_memory(bad_command);
+    strcpy(bad_command, *tag);
+    strcat(bad_command, " BAD");
+
+    // receive response from server
+    while (strncmp(line, ok_command, strlen(ok_command)) != 0 && 
+           strncmp(line, no_command, strlen(no_command)) != 0 && 
+           strncmp(line, bad_command, strlen(bad_command)) != 0) {
         fgets(line, MAX_LINE_SIZE, stream);
         // realloc buffer if needed
         if (strlen(*buffer) + strlen(line) >= MAX_DATA_SIZE) {
             *buffer = realloc(*buffer, strlen(*buffer) * REALLOC_SIZE + 1);
-            if (*buffer == NULL) {
-                fprintf(stderr, "Failed to allocate memory\n");
-                exit(5);
-            }
+            check_memory(*buffer);
         }
         strcat(*buffer, line);
-        // printf("%s", line);
+        //printf("%s", line);
+    }
+
+    if (strncmp(line, no_command, strlen(no_command)) == 0 || 
+        strncmp(line, bad_command, strlen(bad_command)) == 0) {
+        fprintf(stderr, "Failed to send command\n");
+        fprintf(stderr, "Received: %s\n", *buffer);
+        exit(3);
     }
 
     // free memory
     free(total_command);
-    free(confirm_command);
+    free(ok_command);
 }
