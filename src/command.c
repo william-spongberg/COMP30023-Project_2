@@ -2,6 +2,8 @@
 #include "memory.h"
 #include "tag.h"
 
+// TODO: convert magic numbers to defines
+
 char *create_command(int num_strs, ...) {
     va_list args;
     va_start(args, num_strs);
@@ -18,7 +20,8 @@ char *create_command(int num_strs, ...) {
     va_start(args, num_strs);
 
     // create total command
-    char *total_command = (char *)malloc(total_length + 1 + 2);
+    char *total_command =
+        (char *)malloc(total_length + num_strs + CARRIAGE_RETURN_NEWLINE_SIZE);
     check_memory(total_command);
     total_command[0] = '\0';
 
@@ -29,13 +32,13 @@ char *create_command(int num_strs, ...) {
     }
 
     // add carriage return and newline
-    strcat(total_command, "\r\n");
+    strcat(total_command, CARRIAGE_RETURN_NEWLINE);
 
     va_end(args);
     return total_command;
 }
 
-void send_command(char **tag, char *command, char **buffer, int connfd,
+void send_command(char *command, char **tag, char **buffer, int connfd,
                   FILE *stream) {
     // initialise command
     get_num_tag(*tag, MAX_TAG_SIZE);
@@ -46,7 +49,7 @@ void send_command(char **tag, char *command, char **buffer, int connfd,
 
     // send command to server
     write(connfd, total_command, strlen(total_command));
-    printf("Sent: %s\n", total_command);
+    printf("Sent:\n%s\n", total_command);
 
     // receive first response from server
     char line[MAX_LINE_SIZE];
