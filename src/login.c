@@ -3,19 +3,18 @@
 #include "memory.h"
 #include "tag.h"
 
-int login(char *username, char *password, char **tag, char **buffer, int connfd,
+void login(char *username, char *password, char **tag, char **buffer, int connfd,
           FILE *stream) {
     // login command
     char *login = create_command(3, LOGIN, username, password);
     send_command(login, tag, buffer, connfd, stream);
 
     // verify that login was successful
-    // if (verify_login(*buffer) == -1) {
-    //     perror("login");
-    //     fprintf(stderr, "Failed to login\n");
-    //     // TODO: exit on failure?
-    //     return -1;
-    // }
+    if (verify_login(*tag, *buffer) == -1) {
+        perror("login");
+        fprintf(stderr, "Login failure\n");
+        exit(3);
+    }
 
     // print response
     printf("Received:\n%s\n", *buffer);
@@ -24,10 +23,9 @@ int login(char *username, char *password, char **tag, char **buffer, int connfd,
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
     free(login);
-    return 0;
 }
 
-int select_folder(char *folder, char **tag, char **buffer, int connfd,
+void select_folder(char *folder, char **tag, char **buffer, int connfd,
                   FILE *stream) {
     // select command
     char *select = create_command(2, SELECT, folder);
@@ -38,7 +36,7 @@ int select_folder(char *folder, char **tag, char **buffer, int connfd,
         perror("select");
         fprintf(stderr, "Folder not found\n");
         // TODO: exit on failure?
-        return -1;
+        exit(3);
     }
 
     // print response
@@ -48,8 +46,6 @@ int select_folder(char *folder, char **tag, char **buffer, int connfd,
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
     free(select);
-
-    return 0;
 }
 
 int verify_login(char *tag, char *buffer) {
@@ -61,12 +57,12 @@ int verify_login(char *tag, char *buffer) {
         return -1;
     }
 
-    // If the response does not start with the tag, then it is a fatal response
-    if (strncmp(buffer, tag, strlen(tag)) != 0) {
-        perror("login");
-        fprintf(stderr, "Failed to login\n");
-        return -1;
-    }
+    // // If the response does not start with the tag, then it is a fatal response
+    // if (strncmp(buffer, tag, strlen(tag)) != 0) {
+    //     perror("login");
+    //     fprintf(stderr, "Failed to login\n");
+    //     return -1;
+    // }
 
     return 0;
 }
