@@ -126,4 +126,6 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     // free memory
     free(total_command);
     free(ok_command);
+    free(no_command);
+    free(bad_command);
 }

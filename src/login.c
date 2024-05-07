@@ -51,6 +51,7 @@ void select_folder(char *folder, char **tag, char **buffer, int connfd,
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
+    free(quoted_folder);
     free(select);
 }
 
