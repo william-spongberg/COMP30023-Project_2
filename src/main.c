@@ -1,10 +1,10 @@
 #include "command.h"
 #include "connect.h"
+#include "input.h"
 #include "login.h"
 #include "memory.h"
 #include "mime.h"
 #include "parse.h"
-#include "read.h"
 #include "retrieve.h"
 #include "tag.h"
 
@@ -21,8 +21,7 @@ int main(int argc, char *argv[]) {
 
     // read command line arguments
     read_command_line(argc, argv, &username, &password, &folder,
-                      &str_message_num, &command, &hostname);
-    int_message_num = atoi(str_message_num);
+                      &str_message_num, &int_message_num, &command, &hostname);
 
     // print command line arguments for debugging
     // printf("\nUsername: %s\n", username);
@@ -45,8 +44,10 @@ int main(int argc, char *argv[]) {
     check_memory(tag);
     get_num_tag(tag, MAX_TAG_SIZE);
 
-    // login and select folder
+    // login
     login(username, password, &tag, &buffer, connfd, stream);
+
+    // select folder
     select_folder(folder, &tag, &buffer, connfd, stream);
 
     /**
@@ -79,7 +80,8 @@ int main(int argc, char *argv[]) {
         // TODO: fix fetch command not returning anything
         // TODO: use list.c methods
         // fetch command
-        char *fetch_command = create_command(1, "UID FETCH 1:* (UID)");
+        char *fetch_command =
+            create_command(1, "UID FETCH 1:* (BODY[HEADER.FIELDS (SUBJECT)])");
         send_command(fetch_command, &tag, &buffer, connfd, stream);
         // print response
         printf("Received:\n%s\n", buffer);
