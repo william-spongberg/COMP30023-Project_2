@@ -2,8 +2,7 @@
 #include <assert.h>
 
 void read_command_line(int argc, char *argv[], char **username, char **password,
-                       char **folder, char **str_message_num,
-                       int *int_message_num, char **command,
+                       char **folder, char **str_message_num, char **command,
                        char **server_name) {
     int opt;
     while ((opt = getopt(argc, argv, "u:p:f::n::")) != -1) {
@@ -25,9 +24,9 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             break;
         case 'n':
             if (optarg) {
-                *str_message_num = optarg;
+                strcpy(*str_message_num, optarg);
             } else if (optind < argc && NULL == strchr(argv[optind], '-')) {
-                *str_message_num = argv[optind++];
+                strcpy(*str_message_num, argv[optind++]);
             }
             break;
             // case 't':
@@ -37,11 +36,6 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             fprintf(stderr, FORMAT);
             exit(1);
         }
-    }
-
-    // convert message number to integer
-    if (*str_message_num) {
-        *int_message_num = atoi(*str_message_num);
     }
 
     // (optind = extra args not parsed by getopt)

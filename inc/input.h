@@ -11,8 +11,7 @@
     "<command> <server_name> \n"
 
 void read_command_line(int argc, char *argv[], char **username, char **password,
-                       char **folder, char **str_message_num,
-                       int *int_message_num, char **command,
+                       char **folder, char **str_message_num, char **command,
                        char **server_name);
 
 #endif

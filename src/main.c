@@ -9,25 +9,26 @@
 #include "tag.h"
 
 #define FETCH "FETCH"
+#define MAX_MESSAGE_NUM_SIZE 10
 
 int main(int argc, char *argv[]) {
     char *username = NULL;
     char *password = NULL;
     char *folder = NULL;
-    char *str_message_num = NULL;
-    int int_message_num = 0;
+    char *str_message_num = malloc(MAX_MESSAGE_NUM_SIZE * sizeof(char));
+    check_memory(str_message_num);
     char *command = NULL;
     char *hostname = NULL;
 
     // read command line arguments
     read_command_line(argc, argv, &username, &password, &folder,
-                      &str_message_num, &int_message_num, &command, &hostname);
+                      &str_message_num, &command, &hostname);
 
     // print command line arguments for debugging
     // printf("\nUsername: %s\n", username);
     // printf("Password: %s\n", password);
     // printf("Folder: %s\n", folder);
-    // printf("Message number: %d\n", int_message_num);
+    // printf("Message number: %s\n", str_message_num);
     // printf("Command: %s\n", command);
     // printf("Hostname: %s\n\n", hostname);
 
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
     login(username, password, &tag, &buffer, connfd, stream);
 
     // select folder
-    select_folder(folder, &tag, &buffer, connfd, stream);
+    select_folder(&str_message_num, folder, &tag, &buffer, connfd, stream);
 
     /**
      * TODO: Proposed: instead of sending command in main, let each module send
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
     }
 
     // free memory
-    free_memory(stream, 2, tag, buffer);
+    free_memory(stream, 3, tag, buffer, str_message_num);
 
     return 0;
 }
