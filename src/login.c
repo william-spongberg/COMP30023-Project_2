@@ -40,18 +40,18 @@ void logout(char **tag, char **buffer, int connfd, FILE *stream) {
     free(logout);
 }
 
-void select_folder(char *folder, char **tag, char **buffer, int connfd,
+void select_folder(char **str_message_num, char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
     char *q_folder = NULL;
     if (folder == NULL) {
-        // default folder INBOX
-        q_folder = INBOX;
-    } else {
-        // put quotes around folder name
-        q_folder = malloc(strlen(folder) + 3);
-        check_memory(q_folder);
-        sprintf(q_folder, "\"%s\"", folder);
+        // default folder
+        folder = INBOX;
     }
+
+    // put quotes around folder name
+    q_folder = malloc(strlen(folder) + 3);
+    check_memory(q_folder);
+    sprintf(q_folder, "\"%s\"", folder);
 
     // select command
     char *select = create_command(2, SELECT, q_folder);
@@ -65,9 +65,34 @@ void select_folder(char *folder, char **tag, char **buffer, int connfd,
         exit(3);
     }
 
+    if (*str_message_num == NULL) {
+        // get number of messages in folder
+        char *start = strstr(*buffer, "EXISTS");
+        if (start == NULL) {
+            perror("select");
+            fprintf(stderr, "Failed to find number of messages\n");
+        } else {
+            while (*start != '*') {
+                start--;
+            }
+            // skip over "* "
+            start++;
+            start++;
+
+            char *end = start;
+            while (*end != ' ') {
+                end++;
+            }
+
+            strncpy(*str_message_num, start, end - start);
+            (*str_message_num)[end - start] = '\0';
+            printf("message num: %s\n", *str_message_num);
+        }
+    }
+
     // print response for debugging
-    // printf("Received:\n%s\n", *buffer);
-    // printf("\n");
+    printf("Received:\n%s\n", *buffer);
+    printf("\n");
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
