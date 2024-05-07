@@ -7,6 +7,6 @@
 #include <unistd.h>
 
 void check_memory(void *ptr);
-void free_memory(int connfd, FILE *stream, int num_ptrs, ...);
+void free_memory(FILE *stream, int num_ptrs, ...);
 
 #endif

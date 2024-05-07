@@ -91,8 +91,16 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    // logout
+    logout(&tag, &buffer, connfd, stream);
+
+    // close socket
+    if (connfd != -1) {
+        close(connfd);
+    }
+
     // free memory
-    free_memory(connfd, stream, 2, tag, buffer);
+    free_memory(stream, 2, tag, buffer);
 
     return 0;
 }
