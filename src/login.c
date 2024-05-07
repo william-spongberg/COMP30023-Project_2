@@ -42,13 +42,19 @@ void logout(char **tag, char **buffer, int connfd, FILE *stream) {
 
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
-    // put quotes around folder name
-    char *quoted_folder = malloc(strlen(folder) + 3);
-    check_memory(quoted_folder);
-    sprintf(quoted_folder, "\"%s\"", folder);
+    char *q_folder = NULL;
+    if (folder == NULL) {
+        // default folder INBOX
+        q_folder = INBOX;
+    } else {
+        // put quotes around folder name
+        q_folder = malloc(strlen(folder) + 3);
+        check_memory(q_folder);
+        sprintf(q_folder, "\"%s\"", folder);
+    }
 
     // select command
-    char *select = create_command(2, SELECT, quoted_folder);
+    char *select = create_command(2, SELECT, q_folder);
     send_command(select, tag, buffer, connfd, stream);
 
     // verify that folder selection was successful
@@ -65,7 +71,7 @@ void select_folder(char *folder, char **tag, char **buffer, int connfd,
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
-    free(quoted_folder);
+    free(q_folder);
     free(select);
 }
 
