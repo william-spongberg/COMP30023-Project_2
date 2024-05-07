@@ -26,6 +26,20 @@ void login(char *username, char *password, char **tag, char **buffer,
     free(login);
 }
 
+void logout(char **tag, char **buffer, int connfd, FILE *stream) {
+    // logout command
+    char *logout = create_command(1, LOGOUT);
+    send_command(logout, tag, buffer, connfd, stream);
+
+    // print response for debugging
+    // printf("Received:\n%s\n", *buffer);
+    // printf("\n");
+
+    // free memory
+    memset(*buffer, 0, MAX_DATA_SIZE);
+    free(logout);
+}
+
 void select_folder(char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
     // put quotes around folder name

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #define LOGIN "LOGIN"
+#define LOGOUT "LOGOUT"
 #define SELECT "SELECT"
 
 void login(char *username, char *password, char **tag, char **buffer,
