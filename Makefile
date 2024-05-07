@@ -1,12 +1,13 @@
 SRC_DIR = src
+INC_DIR = inc
 OBJ_DIR = obj
 
 CC = gcc
-CFLAGS = -Wall -g -Wextra -pedantic
+CFLAGS = -Wall -g -Wextra -pedantic -I$(INC_DIR)
 
 # get all source and header files
 SRC = $(wildcard $(SRC_DIR)/*.c)
-HDR = $(wildcard $(SRC_DIR)/*.h)
+HDR = $(wildcard $(INC_DIR)/*.h)
 
 # create object files from source files
 OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
@@ -34,4 +35,4 @@ clean:
 	rm -f $(OBJ) $(EXE)
 
 format:
-	clang-format -style=file -i $(SRC_DIR)/*.c $(SRC_DIR)/*.h
+	clang-format -style=file -i $(SRC_DIR)/*.c $(INC_DIR)/*.h
