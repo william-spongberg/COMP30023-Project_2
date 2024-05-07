@@ -2,7 +2,9 @@
 
 ## Format
 
-./fetchmail -u \<username\> -p \<password\> -f \<folder\> -n \<messageNum\> \<command\> \<server_name\>
+./fetchmail -u \<username\> -p \<password\> [-f \<folder\>] [-n \<messageNum\>] [-t] \<command\> \<server_name\>
+
+([ ] means args are optional)
 
 ### Commands
 
@@ -10,7 +12,6 @@
 - parse
 - mime
 - list
-
 
 ## Testing
 
