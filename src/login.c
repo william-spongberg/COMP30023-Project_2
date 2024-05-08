@@ -13,7 +13,6 @@ void login(char *username, char *password, char **tag, char **buffer,
     if (verify_login(*tag, *buffer) == -1) {
         perror("login");
         fprintf(stderr, "Login failure\n");
-        printf("Login failed\n");
         exit(3);
     }
 
@@ -91,8 +90,8 @@ void select_folder(char **str_message_num, char *folder, char **tag, char **buff
     }
 
     // print response for debugging
-    printf("Received:\n%s\n", *buffer);
-    printf("\n");
+    // printf("Received:\n%s\n", *buffer);
+    // printf("\n");
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
