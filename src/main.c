@@ -62,11 +62,12 @@ int main(int argc, char *argv[]) {
     // commands
     if (strcmp(command, "retrieve") == 0) {
         // printf("[retrieve]\n");
-        retrieve_body(str_message_num, &tag, &buffer, connfd, stream);
+        char *body = retrieve_body(str_message_num, &tag, &buffer, connfd, stream);
         // print response
-        printf("Received:\n%s\n", buffer);
+        printf("%s\r\n", body);
         // printf("\n");
         memset(buffer, 0, MAX_DATA_SIZE);
+        free(body);
     } else if (strcmp(command, "parse") == 0) {
         //printf("[parse]\n");
         parse_headers(str_message_num, &tag, &buffer, connfd, stream);
