@@ -131,9 +131,9 @@ void parse_mime(char *buffer) {
     char *message = (char *)malloc(end - start + 2);
     check_memory(message);
     strncpy(message, start, end - start);
-    message[end - start] = '\0';
+    message[end - start - 1] = '\0';
     //printf("[Start Message]");
-    printf("%s\n", message);
+    printf("%s\r\n", message);
     //printf("[End Message]\n\n");
 
     // free memory
