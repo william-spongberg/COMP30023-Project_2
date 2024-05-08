@@ -24,5 +24,6 @@
  * */
 
 int list_emails(const int *client_socket_fd, char *folder_name);
+void parse_list(char *buffer);
 
 #endif

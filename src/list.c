@@ -1,4 +1,5 @@
 #include "list.h"
+#include "memory.h"
 
 // Helper function to check if the mailbox is empty
 int is_empty(const int *client_socket_fd, char *folder_name) {
@@ -100,3 +101,64 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
 
     return 0;
 }
+
+char *get_subject(char *buffer) {
+    char *start = strstr(buffer, "Subject: ");
+    if (start == NULL) {
+        //fprintf(stderr, "Failed to find subject\n");
+        return NULL;
+    }
+
+    start += strlen("Subject: ");
+    char *end = strstr(start, "\n)");
+    //printf("end: %s\n", end);
+    if (end == NULL) {
+        fprintf(stderr, "Failed to find end of subject\n");
+        return NULL;
+    }
+    end -= 2;
+
+    char *subject = malloc(end - start + 1);
+    check_memory(subject);
+
+    strncpy(subject, start, end - start);
+    subject[end - start] = '\0';
+
+    return subject;
+}
+
+void parse_list(char *buffer) {
+    int message_num = 1;
+    char *start = strstr(buffer, "FETCH");
+    if (start == NULL) {
+        fprintf(stderr, "No emails found\n");
+        return;
+    }
+
+    start = strchr(start, '\n') + 1;
+    char *end = strstr(start, "OK");
+    if (end == NULL) {
+        fprintf(stderr, "Failed to parse emails\n");
+        return;
+    }
+
+    while (start < end) {
+        char *subject = get_subject(start);
+        if (subject) {
+            printf("%d: %s\n", message_num, subject);
+        }
+        else {
+            printf("%d: <No subject>\n", message_num);
+        }
+        free(subject);
+
+        char *next = strstr(start, "FETCH");
+        if (next == NULL) {
+            break;
+        }
+
+        start = next + 1;
+        message_num++;
+    }
+}
+
