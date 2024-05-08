@@ -78,42 +78,67 @@ void parse_mime(char *buffer) {
         exit(4);
     }
 
-    // get boundary
-    char *start = strchr(tmp, '=') + 1;
+    // get actual boundary
+    char *start = strchr(tmp, '=');
+    start++;
     char *end = strchr(tmp, '\r');
-    tmp = (char *)malloc(end - start + 1);
-    strncpy(tmp, start, end - start);
-    tmp[end - start] = '\0';
 
-    char *boundary = (char *)malloc(strlen(tmp) + 3);
+    // remove quotes if exist
+    if (start[0] == '"') {
+        start += 1;
+        end -= 2;
+    }
+
+    // add "--" to boundary, copy to new variable
+    char *boundary = (char *)malloc(end-start + 3);
+    check_memory(boundary);
     strcpy(boundary, "--");
-    strcat(boundary, tmp);
-    printf("Boundary: %s\n", boundary);
+    strncat(boundary, start, end - start);
+    //printf("Boundary: %s\n", boundary);
 
     // get headers using position given by boundary
     char *hdr = strstr(buffer, boundary);
+
     start = strstr(hdr, "Content-Transfer-Encoding: ");
+    check_memory(start);
     start = strchr(start, ' ') + 1;
+    check_memory(start);
     end = strchr(start, '\r');
-    char *encoding = (char *)malloc(end - start + 1);
-    strncpy(encoding, start, end - start);
-    encoding[end - start] = '\0';
-    printf("Content-Transfer-Encoding: %s\n", encoding);
+    check_memory(end);
+
+    char *content_transfer_encoding = (char *)malloc(end - start + 2);
+    check_memory(content_transfer_encoding);
+    strncpy(content_transfer_encoding, start, end - start);
+    content_transfer_encoding[end - start] = '\0';
+    //printf("Content-Transfer-Encoding: %s\n", encoding);
 
     start = strstr(hdr, "Content-Type: ");
+    check_memory(start);
     start = strchr(start, ' ') + 1;
+    check_memory(start);
     end = strchr(start, '\r');
-    encoding = (char *)malloc(end - start + 1);
-    strncpy(encoding, start, end - start);
-    encoding[end - start] = '\0';
-    printf("Content-Type: %s\n", encoding);
+    check_memory(end);
+    char *content_type = (char *)malloc(end - start + 1);
+    strncpy(content_type, start, end - start);
+    content_type[end - start] = '\0';
+    //printf("Content-Type: %s\n", encoding);
 
     start = strstr(hdr, "\r\n\r\n");
+    check_memory(start);
     start += 4;
     end = strstr(start, boundary);
-    char *message = (char *)malloc(end - start + 1);
+    check_memory(end);
+    char *message = (char *)malloc(end - start + 2);
+    check_memory(message);
     strncpy(message, start, end - start);
     message[end - start] = '\0';
-    printf("[Start Message]%s", message);
-    printf("[End Message]\n\n");
+    //printf("[Start Message]");
+    printf("%s\n", message);
+    //printf("[End Message]\n\n");
+
+    // free memory
+    free(boundary);
+    free(content_transfer_encoding);
+    free(content_type);
+    free(message);
 }

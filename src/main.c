@@ -74,8 +74,14 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(command, "mime") == 0) {
         printf("[mime]\n");
         // TODO: fix mime
-        get_mime(str_message_num, &tag, &buffer, connfd, stream);
+        char *body = create_command(3, FETCH, str_message_num, "BODY.PEEK[]");
+        send_command(body, &tag, &buffer, connfd, stream);
+        //printf("Received:\n%s\n", buffer);
+        //printf("\n");
+        parse_mime(buffer);
+        //get_mime(str_message_num, &tag, &buffer, connfd, stream);
         memset(buffer, 0, MAX_DATA_SIZE);
+        free(body);
     } else if (strcmp(command, "list") == 0) {
         printf("[list]\n");
         // TODO: fix fetch command not returning anything
