@@ -41,9 +41,14 @@ char *create_command(int num_strs, ...) {
 void send_command(char *command, char **tag, char **buffer, int connfd,
                   FILE *stream) {
     // initialise commands
+
+    // total command
     get_num_tag(*tag, MAX_TAG_SIZE);
     char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 2);
     check_memory(total_command);
+    strcpy(total_command, *tag);
+    strcat(total_command, " ");
+    strcat(total_command, command);
     // ok command
     char *ok_command = malloc(strlen(*tag) + 4);
     check_memory(ok_command);
@@ -59,11 +64,6 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     check_memory(bad_command);
     strcpy(bad_command, *tag);
     strcat(bad_command, " BAD");
-
-    // create total command
-    strcpy(total_command, *tag);
-    strcat(total_command, " ");
-    strcat(total_command, command);
 
     // send command to server
     write(connfd, total_command, strlen(total_command));
