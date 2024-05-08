@@ -38,6 +38,15 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         }
     }
 
+    // print args not found
+    if (*folder == NULL) {
+        printf("Folder not found\n")
+    }
+
+    if (*str_message_num == NULL) {
+        printf("Message not found\n")
+    }
+
     // (optind = extra args not parsed by getopt)
     // check if all required arguments are present
     if (optind + 2 != argc) {
