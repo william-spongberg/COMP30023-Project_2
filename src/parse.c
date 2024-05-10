@@ -19,10 +19,22 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     printf("Subject:%s\n", subject);
 
     // free memory
-    free(from);
-    free(to);
-    free(date);
-    free(subject);
+    if (strlen(from) > 0){
+        free(from);
+    }
+
+    if (strlen(to) > 0) {
+        free(to);
+    }
+
+    if (strlen(date) > 0){
+        free(date);
+    }
+
+    if (strlen(subject) > 0){
+        free(subject);
+    }
+
 }
 
 char *get_message(char *header) {
@@ -36,6 +48,14 @@ char *get_message(char *header) {
     // remove trailing chars after message
     char *end = strchr(header, '\n');
     check_memory(end);
+
+    // If the length of the message is 0, return empty string
+    if (end - start <= 0) {
+        char *empty = (char *)malloc(1);
+        check_memory(empty);
+        empty[0] = '\0';
+        return empty;
+    }
 
     // copy message
     char *message = (char *)malloc(end - start + 2);
