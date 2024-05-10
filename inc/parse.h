@@ -1,6 +1,6 @@
 #ifndef PARSE_H
 #define PARSE_H
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

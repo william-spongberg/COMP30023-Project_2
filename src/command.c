@@ -115,6 +115,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
         }
         // DO NOT cat buffer if line is the status of the command
         strcat(*buffer, line);
+
         // printf("%s", line);
     }
 
