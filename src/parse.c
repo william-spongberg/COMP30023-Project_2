@@ -7,10 +7,10 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     retrieve_headers(str_message_num, tag, buffer, connfd, stream);
 
     // get headers from first occurence of header title
-    char *from = get_message(strstr(*buffer, "From: "));
-    char *to = get_message(strstr(*buffer, "To: "));
-    char *date = get_message(strstr(*buffer, "Date: "));
-    char *subject = get_message(strstr(*buffer, "Subject: "));
+    char *from = get_message(strcasestr(*buffer, "From: "));
+    char *to = get_message(strcasestr(*buffer, "To: "));
+    char *date = get_message(strcasestr(*buffer, "Date: "));
+    char *subject = get_message(strcasestr(*buffer, "Subject: "));
 
     // print headers
     printf("From:%s\n", from);
