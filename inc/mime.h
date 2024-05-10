@@ -18,4 +18,5 @@
 
 int get_mime(char *str_message_num, char **tag, char **buffer, int connfd,
              FILE *stream);
+void parse_mime(char *buffer);
 #endif

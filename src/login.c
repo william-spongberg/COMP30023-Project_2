@@ -13,7 +13,6 @@ void login(char *username, char *password, char **tag, char **buffer,
     if (verify_login(*tag, *buffer) == -1) {
         perror("login");
         fprintf(stderr, "Login failure\n");
-        printf("Login failed\n");
         exit(3);
     }
 
@@ -26,15 +25,35 @@ void login(char *username, char *password, char **tag, char **buffer,
     free(login);
 }
 
-void select_folder(char *folder, char **tag, char **buffer, int connfd,
+void logout(char **tag, char **buffer, int connfd, FILE *stream) {
+    // logout command
+    char *logout = create_command(1, LOGOUT);
+    send_command(logout, tag, buffer, connfd, stream);
+
+    // print response for debugging
+    // printf("Received:\n%s\n", *buffer);
+    // printf("\n");
+
+    // free memory
+    memset(*buffer, 0, MAX_DATA_SIZE);
+    free(logout);
+}
+
+void select_folder(char **str_message_num, char *folder, char **tag, char **buffer, int connfd,
                    FILE *stream) {
+    char *q_folder = NULL;
+    if (folder == NULL) {
+        // default folder
+        folder = INBOX;
+    }
+
     // put quotes around folder name
-    char *quoted_folder = malloc(strlen(folder) + 3);
-    check_memory(quoted_folder);
-    sprintf(quoted_folder, "\"%s\"", folder);
+    q_folder = malloc(strlen(folder) + 3);
+    check_memory(q_folder);
+    sprintf(q_folder, "\"%s\"", folder);
 
     // select command
-    char *select = create_command(2, SELECT, quoted_folder);
+    char *select = create_command(2, SELECT, q_folder);
     send_command(select, tag, buffer, connfd, stream);
 
     // verify that folder selection was successful
@@ -45,12 +64,38 @@ void select_folder(char *folder, char **tag, char **buffer, int connfd,
         exit(3);
     }
 
+    if (*str_message_num == NULL) {
+        // get number of messages in folder
+        char *start = strstr(*buffer, "EXISTS");
+        if (start == NULL) {
+            perror("select");
+            fprintf(stderr, "Failed to find number of messages\n");
+        } else {
+            while (*start != '*') {
+                start--;
+            }
+            // skip over "* "
+            start++;
+            start++;
+
+            char *end = start;
+            while (*end != ' ') {
+                end++;
+            }
+
+            strncpy(*str_message_num, start, end - start);
+            (*str_message_num)[end - start] = '\0';
+            printf("message num: %s\n", *str_message_num);
+        }
+    }
+
     // print response for debugging
     // printf("Received:\n%s\n", *buffer);
     // printf("\n");
 
     // free memory
     memset(*buffer, 0, MAX_DATA_SIZE);
+    free(q_folder);
     free(select);
 }
 

@@ -1,17 +1,11 @@
-#include "read.h"
+#include "input.h"
 #include <assert.h>
 
-// *TODO*
-// fetchmail
-// -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t]
-// <command> <server_name>
-// Where <command> may be one of: retrieve, parse, mime, or list
-
 void read_command_line(int argc, char *argv[], char **username, char **password,
-                       char **folder, char **message_num, char **command,
+                       char **folder, char **str_message_num, char **command,
                        char **server_name) {
     int opt;
-    while ((opt = getopt(argc, argv, "u:p:f:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "u:p:f::n::")) != -1) {
         switch (opt) {
         case 'u':
             *username = optarg;
@@ -22,29 +16,41 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             assert(*password != NULL);
             break;
         case 'f':
-            *folder = optarg;
-            assert(*folder != NULL);
+            if (optarg) {
+                *folder = optarg;
+            } else if (optind < argc && NULL == strchr(argv[optind], '-')) {
+                *folder = argv[optind++];
+            }
             break;
         case 'n':
-            *message_num = optarg;
+            if (optarg) {
+                strcpy(*str_message_num, optarg);
+            } else if (optind < argc && NULL == strchr(argv[optind], '-')) {
+                strcpy(*str_message_num, argv[optind++]);
+            }
             break;
             // case 't':
             //     // only specified if using TLS (extension task)
             //     break;
         default:
-            fprintf(stderr,
-                    "Usage: -u <username> -p <password> [-f <folder>] [-n "
-                    "<messageNum>] [-t]\n <command> <server_name> \n");
+            fprintf(stderr, FORMAT);
             exit(1);
         }
     }
 
+    // print args not found
+    if (*folder == NULL) {
+        printf("Folder not found\n");
+    }
+
+    if (*str_message_num == NULL) {
+        printf("Message not found\n");
+    }
+
     // (optind = extra args not parsed by getopt)
     // check if all required arguments are present
-    // TODO: update to allow optional args
     if (optind + 2 != argc) {
-        fprintf(stderr, "Usage: -u <username> -p <password> [-f <folder>] [-n "
-                        "<messageNum>] [-t]\n <command> <server_name> \n");
+        fprintf(stderr, FORMAT);
         exit(1);
     }
 

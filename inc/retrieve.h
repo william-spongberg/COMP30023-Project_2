@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-int retrieve_body(char *str_message_num, char **tag, char **buffer, int connfd,
+char* retrieve_body(char *str_message_num, char **tag, char **buffer, int connfd,
                   FILE *stream);
 int retrieve_headers(char *str_message_num, char **tag, char **buffer,
                      int connfd, FILE *stream);

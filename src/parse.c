@@ -13,11 +13,10 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     char *subject = get_message(strstr(*buffer, "Subject: "));
 
     // print headers
-    printf("From: %s\n", from);
-    printf("To: %s\n", to);
-    printf("Date: %s\n", date);
-    printf("Subject: %s\n", subject);
-    printf("\n");
+    printf("From:%s\n", from);
+    printf("To:%s\n", to);
+    printf("Date:%s\n", date);
+    printf("Subject:%s\n", subject);
 
     // free memory
     free(from);
@@ -28,15 +27,21 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
 
 char *get_message(char *header) {
     if (header == NULL) {
-        exit(3);
+        return "";
+        //exit(3);
     }
     // remove first word
     char *start = strchr(header, ' ') + 1;
+    check_memory(start);
     // remove trailing chars after message
-    char *end = strchr(header, '\r');
+    char *end = strchr(header, '\n');
+    check_memory(end);
+
     // copy message
-    char *message = (char *)malloc(end - start + 1);
-    strncpy(message, start, end - start);
-    message[end - start] = '\0';
+    char *message = (char *)malloc(end - start + 2);
+    check_memory(message);
+    strcpy(message, " ");
+    strncat(message, start, end - start);
+    message[end - start + 1] = '\0';
     return message;
 }
