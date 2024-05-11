@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
         send_command(body, &tag, &buffer, connfd, stream);
         //printf("Received:\n%s\n", buffer);
         //printf("\n");
-        parse_mime(buffer);
-        //get_mime(str_message_num, &tag, &buffer, connfd, stream);
+        // parse_mime(buffer);
+        get_mime(buffer);
         memset(buffer, 0, MAX_DATA_SIZE);
         free(body);
     } else if (strcmp(command, "list") == 0) {
