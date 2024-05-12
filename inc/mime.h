@@ -16,7 +16,6 @@
 // the following condition: Content type is text/plain Charset is UTF - 8
 // Content transfer encoding quoted-printable | 7bit | 8bit
 
-int get_mime(char *str_message_num, char **tag, char **buffer, int connfd,
-             FILE *stream);
+int get_mime(char *buffer);
 void parse_mime(char *buffer);
 #endif

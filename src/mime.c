@@ -2,71 +2,82 @@
 #include "memory.h"
 #include "retrieve.h"
 
-int get_mime(char *str_message_num, char **tag, char **buffer, int connfd,
-             FILE *stream) {
-    // retrieve email body
-    retrieve_body(str_message_num, tag, buffer, connfd, stream);
-    char *body = *buffer;
+int get_mime(char *buffer) {
+
+    // printf("Buffer:\n %s\n", buffer);
 
     // Setup required content type for search
-    char *content_type = "Content-Type: text/plain; charset=UTF-8";
+    char *content_type = "Content-Type: text/plain;";
     char *content_transfer_encoding[] = {"quoted-printable", "7bit", "8bit"};
 
     // Boundary to separate the body parts
     char *boundary_header = "boundary=";
-    char *boundary_ptr = strstr(body, boundary_header);
-    // Extract the boundary value
-    char *boundary_start = boundary_ptr + strlen(boundary_header) + 1;
-    char *boundary_end = strchr(boundary_start, '\"');
-    char *boundary_value = (char *)malloc(boundary_end - boundary_start + 1);
-    strncpy(boundary_value, boundary_start, boundary_end - boundary_start);
-    // Add "--" to search for the boundary in the email body
-    char *boundary = (char *)malloc(strlen(boundary_value) + 5);
-    check_memory(boundary);
-    boundary = strcat("--", boundary_value);
+    char *boundary_ptr = strstr(buffer, boundary_header);
+    // get actual boundary
+    char *start = strchr(boundary_ptr, '=');
+    start++;
+    char *end = strchr(boundary_ptr, '\r');
 
-    char *content_type_ptr = strstr(body, content_type);
-
-    if (content_type_ptr == NULL) {
-        fprintf(stderr,
-                "Content type text/plain with UTF-8 charset not found\n");
-        return -1;
+    // remove quotes if exist
+    if (start[0] == '"') {
+        start += 1;
+        end -= 2;
     }
 
-    while (content_type_ptr != NULL) {
-        // From the occurrence of matching content type found, search for
-        // matching content transfer encoding
-        for (int i = 0; i < 3; i++) {
-            char *content_transfer_encoding_ptr =
-                strstr(content_type_ptr, content_transfer_encoding[i]);
-            if (content_transfer_encoding_ptr != NULL) {
-                // Found matching transfer encoding, print the body part
-                // separated by "--boundary"
-                char *body_end =
-                    strstr(content_transfer_encoding_ptr, boundary);
-                char *body_start = content_transfer_encoding_ptr;
-                char *body = (char *)malloc(body_end - body_start + 1);
-                strncpy(body, body_start, body_end - body_start);
-                printf("%s\n", body);
+    // add "--" to boundary, copy to new variable
+    char *boundary = (char *)malloc(end-start + 3);
+    check_memory(boundary);
+    strcpy(boundary, "--");
+    strncat(boundary, start, end - start);
+    boundary_ptr = strstr(boundary_ptr + 1, boundary);
+    // printf("Boundary: %s\n", boundary);
 
-                // Free the allocated memory
-                free(content_type_ptr);
-                free(body);
-                return 0;
+    // printf("boundary_ptr:\n %s\n", boundary_ptr);
+    // Continue until end of buffer
+    while (boundary_ptr != NULL) {
+        // Find the content type
+        char *content_type_ptr = strstr(boundary_ptr, "Content-Type: ");
+        if (content_type_ptr == NULL) {
+            fprintf(stderr, "No content type found\n");
+            exit(6);
+        }
+        // Check if content type is text/plain
+        if (strstr(content_type_ptr, content_type) != NULL && 
+            strstr(content_type_ptr, "charset=UTF-8") != NULL &&
+            ((strstr(content_type_ptr, content_transfer_encoding[0]) != NULL ||
+            strstr(content_type_ptr, content_transfer_encoding[1]) != NULL ||
+            strstr(content_type_ptr, content_transfer_encoding[2]) != NULL))){
+            // Find the start of the message
+            char *start = strstr(content_type_ptr, "\r\n\r\n");
+            if (start == NULL) {
+                fprintf(stderr, "No message found\n");
+                exit(7);
+            }
+            start += 4;
+            // Find the end of the message
+            char *end = strstr(start, boundary);
+            if (end == NULL) {
+                fprintf(stderr, "No end of message found\n");
+                exit(8);
             }
 
-            // If no matching content transfer encoding found, search for the
-            // next content type
-            content_type_ptr = strstr(content_type_ptr + 1, content_type);
+            char *message = (char *)malloc(end - start + 2);
+            check_memory(message);
+            strncpy(message, start, end - start);
+            message[end - start - 1] = '\0';
+
+            printf("%s\n", message);
+            free(message);
         }
+        // Find the next boundary
+        boundary_ptr = strstr(boundary_ptr + 1, boundary);
     }
 
-    // Free the allocated memory
-    free(content_type_ptr);
+    free(boundary);
 
     // No required content type with the desired charset and transferencoding
     // found
-    return -1;
+    return 0;
 }
 
 // TODO: old working version of mime, fix function above with this
