@@ -67,7 +67,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
 
     // send command to server
     write(connfd, total_command, strlen(total_command));
-    printf("Sent:\n%s\n", total_command);
+    // printf("Sent:\n%s\n", total_command);
 
     // receive first response from server
     char line[MAX_LINE_SIZE];

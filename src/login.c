@@ -57,12 +57,12 @@ void select_folder(char **str_message_num, char *folder, char **tag, char **buff
     send_command(select, tag, buffer, connfd, stream);
 
     // verify that folder selection was successful
-    if (verify_folder_selection(*buffer, NULL) == -1) {
-        perror("select");
-        fprintf(stderr, "Folder not found\n");
-        // TODO: exit on failure?
-        exit(3);
-    }
+    // if (verify_folder_selection(*buffer, NULL) == -1) {
+    //     perror("select");
+    //     fprintf(stderr, "Folder not found\n");
+    //     // TODO: exit on failure?
+    //     exit(3);
+    // }
 
     if (*str_message_num == NULL) {
         // get number of messages in folder
