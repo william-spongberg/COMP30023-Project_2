@@ -78,6 +78,7 @@ void send_command(char *command, char **tag, char **buffer, int connfd,
     if (strncmp(*buffer, no_command, strlen(no_command)) == 0 ||
         strncmp(*buffer, bad_command, strlen(bad_command)) == 0) {
         if (strstr(command, "FETCH") != NULL) {
+            printf("Message not found\n");
             fprintf(stderr, "Failed to retrieve message\n");
             fprintf(stderr, "Received: %s\n", *buffer);
             exit(3);
