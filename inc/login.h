@@ -16,4 +16,4 @@ void select_folder(char **str_message_num, char *folder, char **tag,
 int verify_login(char *tag, char *buffer);
 int verify_folder_selection(char *buffer, int *msg_num);
 
-#endif // PROJ2_LIANZHANG2_WSPONGBERG_LOGIN_H
+#endif
