@@ -85,7 +85,7 @@ void select_folder(char **str_message_num, char *folder, char **tag,
 
             strncpy(*str_message_num, start, end - start);
             (*str_message_num)[end - start] = '\0';
-            printf("message num: %s\n", *str_message_num);
+            fprintf(stderr, "New message number: %s\n", *str_message_num);
         }
     }
 
@@ -103,8 +103,6 @@ int verify_login(char *tag, char *buffer) {
     // TODO: fix this + mem leaks caused by it
     // If the response does not contain "Logged in", then it is a fatal response
     if (strstr(buffer, "Logged in") == NULL) {
-        perror("login");
-        fprintf(stderr, "Failed to login\n");
         return -1;
     }
 
