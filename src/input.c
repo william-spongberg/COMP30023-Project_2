@@ -8,19 +8,9 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         switch (opt) {
         case 'u':
             *username = optarg;
-            if (*username == NULL) {
-                fprintf(stderr, "Username not found\n");
-                fprintf(stderr, FORMAT);
-                exit(1);
-            }
             break;
         case 'p':
             *password = optarg;
-            if (*password == NULL) {
-                fprintf(stderr, "Password not found\n");
-                fprintf(stderr, FORMAT);
-                exit(1);
-            }
             break;
         case 'f':
             if (optarg) {
@@ -53,32 +43,27 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         }
     }
 
-    // print args not found
-    // if (*folder == NULL) {
-    //     printf("Folder not found\n");
-    // }
-
-    if (*str_message_num == NULL) {
-        printf("Message not found\n");
-    }
-
     // (optind = extra args not parsed by getopt)
-    // check if all required arguments are present
+    // check if arguments are present
     if (optind + 2 != argc) {
         fprintf(stderr, FORMAT);
         exit(1);
     }
 
-    // // get command and server name
+    // get command and server name
     *command = argv[optind];
-    // printf("command: %s\n", *command);
     *server_name = argv[optind + 1];
-    // printf("server_name: %s\n", *server_name);
 
     // check if command is valid
     if (strcmp(*command, "retrieve") != 0 && strcmp(*command, "parse") != 0 &&
         strcmp(*command, "mime") != 0 && strcmp(*command, "list") != 0) {
         fprintf(stderr, "Invalid command\n");
+        exit(1);
+    }
+
+    // check if all required arguments are present
+    if (*username == NULL || *password == NULL || *server_name == NULL) {
+        fprintf(stderr, FORMAT);
         exit(1);
     }
 }
