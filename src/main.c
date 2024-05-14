@@ -10,7 +10,6 @@
 #include "tag.h"
 
 #define FETCH "FETCH"
-#define MAX_MESSAGE_NUM_SIZE 10
 
 int main(int argc, char *argv[]) {
     char *username = NULL;

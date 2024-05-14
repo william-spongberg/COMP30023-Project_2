@@ -1,5 +1,4 @@
 #include "input.h"
-#include <assert.h>
 
 void read_command_line(int argc, char *argv[], char **username, char **password,
                        char **folder, char **str_message_num, char **command,
@@ -24,8 +23,10 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             break;
         case 'n':
             if (optarg) {
+                assert(strlen(optarg) < MAX_MESSAGE_NUM_SIZE);
                 strcpy(*str_message_num, optarg);
             } else if (optind < argc && NULL == strchr(argv[optind], '-')) {
+                assert(strlen(argv[optind++]) < MAX_MESSAGE_NUM_SIZE);
                 strcpy(*str_message_num, argv[optind++]);
             }
             break;
