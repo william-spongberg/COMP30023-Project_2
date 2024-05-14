@@ -17,7 +17,14 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     print_header(FROM, from);
     print_header(TO, to);
     print_header(DATE, date);
-    print_header(SUBJECT, subject);
+
+    printf(SUBJECT);
+    if (subject != NULL) {
+        printf(" %s\n", subject);
+    }
+    else {
+        printf(" %s\n", NO_SUBJECT);
+    }
 
     // free memory
     free_string(from);
@@ -29,7 +36,7 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
 void print_header(char *header, char *str) {
     printf("%s", header);
     if (str != NULL)
-        printf("%s\n", str);
+        printf(" %s\n", str);
     else
         printf("\n");
 }
@@ -52,10 +59,9 @@ char *get_message(char *header) {
         return NULL;
     }
 
+    // check if next char is aplhanumeric letter (still part of message)
     char *next_start = NULL;
     char *next_end = NULL;
-
-    // check if next char is letter
     if (isalpha(*(end + 2)) == 0) {
         next_start = end + 2;
         next_end = strstr(end + 2, "\r\n");
@@ -71,7 +77,12 @@ char *get_message(char *header) {
 
 char *copy_message(char *start, char *end, char *next_start, char *next_end) {
     char *message = NULL;
-    if (next_start == NULL) {
+    if (next_start == NULL || next_end == NULL) {
+        // remove white space at the end of the message
+        while (isspace(*(end - 1))) {
+            end--;
+        }
+
         message = (char *)malloc(end - start + 1);
         check_memory(message);
         strncpy(message, start, end - start);

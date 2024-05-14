@@ -7,10 +7,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#define TO "To: "
-#define FROM "From: "
-#define DATE "Date: "
-#define SUBJECT "Subject: "
+#define TO "To:"
+#define FROM "From:"
+#define DATE "Date:"
+#define SUBJECT "Subject:"
+#define NO_SUBJECT "<No subject>"
 
 void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
                    FILE *stream);
