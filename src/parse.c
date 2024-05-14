@@ -20,7 +20,12 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
 
     printf(SUBJECT);
     if (subject != NULL) {
-        printf(" %s\n", subject);
+        // Find the first non-space character in the subject
+        char *start = subject;
+        while (isspace(*start)) {
+            start++;
+        }
+        printf(" %s\n", start);
     } else {
         printf(" %s\n", NO_SUBJECT);
     }
