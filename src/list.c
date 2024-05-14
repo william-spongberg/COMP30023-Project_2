@@ -105,13 +105,13 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
 char *get_subject(char *buffer) {
     char *start = strstr(buffer, "Subject: ");
     if (start == NULL) {
-        // fprintf(stderr, "Failed to find subject\n");
+        // fprintf(stderr, "Failed to find start of subject\n");
         return NULL;
     }
 
     start += strlen("Subject: ");
-    char *end = strstr(start, "\n)");
-    // printf("end: %s\n", end);
+    char *end = strstr(start, "\r\n)");
+
     if (end == NULL) {
         fprintf(stderr, "Failed to find end of subject\n");
         return NULL;
@@ -120,9 +120,17 @@ char *get_subject(char *buffer) {
 
     char *subject = malloc(end - start + 1);
     check_memory(subject);
-
     strncpy(subject, start, end - start);
     subject[end - start] = '\0';
+
+    // remove \r and \n
+    char *start, *end;
+    for (start = end = subject; *start != '\0'; start++) {
+        *end = *start;
+        // skip \r and \n
+        if (*start != '\r' && *start != '\n') end++;
+    }
+    *end = '\0';
 
     return subject;
 }
@@ -135,7 +143,8 @@ void parse_list(char *buffer) {
         return;
     }
 
-    start = strchr(start, '\n') + 1;
+    // fprintf(stderr, "Emails:\n%s\n", start);
+
     char *end = strstr(start, "OK");
     if (end == NULL) {
         fprintf(stderr, "Failed to parse emails\n");
@@ -151,12 +160,12 @@ void parse_list(char *buffer) {
         }
         free(subject);
 
-        char *next = strstr(start, "FETCH");
+        char *next = strstr(start + 1, "FETCH");
         if (next == NULL) {
             break;
         }
 
-        start = next + 1;
+        start = next;
         message_num++;
     }
 }
