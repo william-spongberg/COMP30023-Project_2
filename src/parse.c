@@ -72,35 +72,31 @@ char *get_message(char *header) {
     char *message = copy_message(start, end, next_start, next_end);
     check_memory(message);
 
+    // remove trailing whitespace
+    char *end_of_message = message + strlen(message) - 1;
+    while (isspace(*end_of_message)) {
+        *end_of_message = '\0';
+        end_of_message--;
+    }
+
     return message;
 }
 
 char *copy_message(char *start, char *end, char *next_start, char *next_end) {
     char *message = NULL;
     if (next_start == NULL || next_end == NULL) {
-        // remove white space at the end of the message
-        while (isspace(*(end - 1))) {
-            end--;
-        }
-
         message = (char *)malloc(end - start + 1);
         check_memory(message);
         strncpy(message, start, end - start);
         message[end - start] = '\0';
     }
     else {
-        message = (char *)malloc(next_end - start + 1);
-        // remove white space at the end of the message
-        while (isspace(*(next_end - 1))) {
-            next_end--;
-        }
-
+        message = (char *)malloc(next_end - start + 2);
         check_memory(message);
         strncpy(message, start, end - start);
-        if (next_start != NULL && next_end != NULL) {
-            strncat(message, next_start, next_end - next_start);
-        }
-        message[next_end - start] = '\0';
+        message[end - start] = '\0';
+        strncat(message, next_start, next_end - next_start + 1);
+        message[next_end - start + 1] = '\0';
     }
 
     return message;
