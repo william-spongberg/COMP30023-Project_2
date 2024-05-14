@@ -8,11 +8,19 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         switch (opt) {
         case 'u':
             *username = optarg;
-            assert(*username != NULL);
+            if (*username == NULL) {
+                fprintf(stderr, "Username not found\n");
+                fprintf(stderr, FORMAT);
+                exit(1);
+            }
             break;
         case 'p':
             *password = optarg;
-            assert(*password != NULL);
+            if (*password == NULL) {
+                fprintf(stderr, "Password not found\n");
+                fprintf(stderr, FORMAT);
+                exit(1);
+            }
             break;
         case 'f':
             if (optarg) {
@@ -23,10 +31,16 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
             break;
         case 'n':
             if (optarg) {
-                assert(strlen(optarg) < MAX_MESSAGE_NUM_SIZE);
+                if (!(strlen(optarg) < MAX_MESSAGE_NUM_SIZE)) {
+                    fprintf(stderr, "Message number too long\n");
+                    exit(5);
+                }
                 strcpy(*str_message_num, optarg);
             } else if (optind < argc && NULL == strchr(argv[optind], '-')) {
-                assert(strlen(argv[optind++]) < MAX_MESSAGE_NUM_SIZE);
+                if (!(strlen(argv[optind]) < MAX_MESSAGE_NUM_SIZE)) {
+                    fprintf(stderr, "Message number too long\n");
+                    exit(5);
+                }
                 strcpy(*str_message_num, argv[optind++]);
             }
             break;
