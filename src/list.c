@@ -124,7 +124,6 @@ char *get_subject(char *buffer) {
     subject[end - start] = '\0';
 
     // remove \r and \n
-    char *start, *end;
     for (start = end = subject; *start != '\0'; start++) {
         *end = *start;
         // skip \r and \n
