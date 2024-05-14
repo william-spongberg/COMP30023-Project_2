@@ -67,6 +67,11 @@ char *get_message(char *header) {
         check_memory(next_end);
     }
 
+    // remove leading whitespace
+    while (isspace(*start)) {
+        start++;
+    }
+
     // copy message
     char *message = copy_message(start, end, next_start, next_end);
     check_memory(message);
