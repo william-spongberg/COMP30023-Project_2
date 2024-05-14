@@ -1,11 +1,13 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <assert.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_MESSAGE_NUM_SIZE 100
 #define FORMAT                                                                 \
     "Usage: -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t] " \
     "<command> <server_name> \n"

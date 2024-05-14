@@ -81,7 +81,7 @@ int get_mime(char *buffer) {
         }
         // Find the next boundary
         boundary_ptr = strstr(end + 1, boundary);
-        
+
         // check if boundary is end of message
         if (*(boundary_ptr + strlen(boundary)) == '-') {
             break;

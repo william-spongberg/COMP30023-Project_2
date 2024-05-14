@@ -32,7 +32,7 @@
 ./fetchmail -p pass -f headers -u test@comp30023 -n 2 parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-caps.out
 ./fetchmail -f headers -u test@comp30023 -p pass -n 3 parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-nosubj.out
 ./fetchmail -u test@comp30023 -n 4 -p pass -f headers parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-nested.out
-./fetchmail -f headers -u test@comp30023 -n 5 -p pass parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-ws.out
+./fetchmail -f headers -u test@comp30023 -n 5 -p pass parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-ws.out.2
 
 ### MIME
 
@@ -69,8 +69,6 @@ valgrind -s --leak-check=full --show-leak-kinds=all ./fetchmail -u test@comp3002
 ./fetchmail -u f -p a retrieve aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ./fetchmail -f Test -p $'pass\r\nCOMP30023 LOGIN inject@comp30023 pass' -u inject@comp30023 -n 1 retrieve unimelb-comp30023-2024.cloud.edu.au
 ./fetchmail -f Test -p pass -u test@comp30023 -n 1 retrieve <a-server-which-disconnects>
-
-./fetchmail -f Test -p pass -u test@comp30023 -n 1 -t retrieve unimelb-comp30023-2024.cloud.edu.au | diff - out/ret-ed512.out
 
 ./fetchmail -f more -p pass -u test@comp30023 -n 2 retrieve unimelb-comp30023-2024.cloud.edu.au | diff - out/ret-nul.out
 ./fetchmail -f more -p pass -u test@comp30023 -n 1 parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-mst-tab.out

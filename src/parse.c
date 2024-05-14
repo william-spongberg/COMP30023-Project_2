@@ -21,8 +21,7 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     printf(SUBJECT);
     if (subject != NULL) {
         printf(" %s\n", subject);
-    }
-    else {
+    } else {
         printf(" %s\n", NO_SUBJECT);
     }
 
@@ -68,6 +67,11 @@ char *get_message(char *header) {
         check_memory(next_end);
     }
 
+    // remove leading whitespace
+    while (isspace(*start)) {
+        start++;
+    }
+
     // copy message
     char *message = copy_message(start, end, next_start, next_end);
     check_memory(message);
@@ -89,8 +93,7 @@ char *copy_message(char *start, char *end, char *next_start, char *next_end) {
         check_memory(message);
         strncpy(message, start, end - start);
         message[end - start] = '\0';
-    }
-    else {
+    } else {
         message = (char *)malloc(next_end - start + 2);
         check_memory(message);
         strncpy(message, start, end - start);
