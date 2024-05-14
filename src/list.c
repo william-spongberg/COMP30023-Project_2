@@ -127,7 +127,8 @@ char *get_subject(char *buffer) {
     for (start = end = subject; *start != '\0'; start++) {
         *end = *start;
         // skip \r and \n
-        if (*start != '\r' && *start != '\n') end++;
+        if (*start != '\r' && *start != '\n')
+            end++;
     }
     *end = '\0';
 
