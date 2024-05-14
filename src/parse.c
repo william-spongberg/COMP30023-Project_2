@@ -90,6 +90,11 @@ char *copy_message(char *start, char *end, char *next_start, char *next_end) {
     }
     else {
         message = (char *)malloc(next_end - start + 1);
+        // remove white space at the end of the message
+        while (isspace(*(next_end - 1))) {
+            next_end--;
+        }
+
         check_memory(message);
         strncpy(message, start, end - start);
         if (next_start != NULL && next_end != NULL) {
