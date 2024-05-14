@@ -105,13 +105,13 @@ int list_emails(const int *client_socket_fd, char *folder_name) {
 char *get_subject(char *buffer) {
     char *start = strstr(buffer, "Subject: ");
     if (start == NULL) {
-        //fprintf(stderr, "Failed to find subject\n");
+        // fprintf(stderr, "Failed to find subject\n");
         return NULL;
     }
 
     start += strlen("Subject: ");
     char *end = strstr(start, "\n)");
-    //printf("end: %s\n", end);
+    // printf("end: %s\n", end);
     if (end == NULL) {
         fprintf(stderr, "Failed to find end of subject\n");
         return NULL;
@@ -146,8 +146,7 @@ void parse_list(char *buffer) {
         char *subject = get_subject(start);
         if (subject) {
             printf("%d: %s\n", message_num, subject);
-        }
-        else {
+        } else {
             printf("%d: <No subject>\n", message_num);
         }
         free(subject);
@@ -161,4 +160,3 @@ void parse_list(char *buffer) {
         message_num++;
     }
 }
-

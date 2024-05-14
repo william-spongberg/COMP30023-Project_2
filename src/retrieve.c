@@ -6,8 +6,8 @@
 #define BODY "BODY.PEEK[]"
 #define BODY_HEADERS "BODY.PEEK[HEADER.FIELDS (FROM TO DATE SUBJECT)]"
 
-char* retrieve_body(char *str_message_num, char **tag, char **buffer, int connfd,
-                  FILE *stream) {
+char *retrieve_body(char *str_message_num, char **tag, char **buffer,
+                    int connfd, FILE *stream) {
     // get + send command
     char *retrieve_command = create_command(3, FETCH, str_message_num, BODY);
     send_command(retrieve_command, tag, buffer, connfd, stream);

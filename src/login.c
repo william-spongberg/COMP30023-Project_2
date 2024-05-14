@@ -39,8 +39,8 @@ void logout(char **tag, char **buffer, int connfd, FILE *stream) {
     free(logout);
 }
 
-void select_folder(char **str_message_num, char *folder, char **tag, char **buffer, int connfd,
-                   FILE *stream) {
+void select_folder(char **str_message_num, char *folder, char **tag,
+                   char **buffer, int connfd, FILE *stream) {
     char *q_folder = NULL;
     if (folder == NULL) {
         // default folder

@@ -25,7 +25,7 @@ int get_mime(char *buffer) {
     }
 
     // add "--" to boundary, copy to new variable
-    char *boundary = (char *)malloc(end-start + 3);
+    char *boundary = (char *)malloc(end - start + 3);
     check_memory(boundary);
     strcpy(boundary, "--");
     strncat(boundary, start, end - start);
@@ -46,11 +46,12 @@ int get_mime(char *buffer) {
             exit(6);
         }
         // Check if content type is text/plain
-        if (strstr(content_type_ptr, content_type) != NULL && 
+        if (strstr(content_type_ptr, content_type) != NULL &&
             strstr(content_type_ptr, "charset=UTF-8") != NULL &&
             ((strstr(content_type_ptr, content_transfer_encoding[0]) != NULL ||
-            strstr(content_type_ptr, content_transfer_encoding[1]) != NULL ||
-            strstr(content_type_ptr, content_transfer_encoding[2]) != NULL))){
+              strstr(content_type_ptr, content_transfer_encoding[1]) != NULL ||
+              strstr(content_type_ptr, content_transfer_encoding[2]) !=
+                  NULL))) {
             // Find the start of the message
             char *start = strstr(content_type_ptr, "\r\n\r\n");
             if (start == NULL) {
