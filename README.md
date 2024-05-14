@@ -70,8 +70,6 @@ valgrind -s --leak-check=full --show-leak-kinds=all ./fetchmail -u test@comp3002
 ./fetchmail -f Test -p $'pass\r\nCOMP30023 LOGIN inject@comp30023 pass' -u inject@comp30023 -n 1 retrieve unimelb-comp30023-2024.cloud.edu.au
 ./fetchmail -f Test -p pass -u test@comp30023 -n 1 retrieve <a-server-which-disconnects>
 
-./fetchmail -f Test -p pass -u test@comp30023 -n 1 -t retrieve unimelb-comp30023-2024.cloud.edu.au | diff - out/ret-ed512.out
-
 ./fetchmail -f more -p pass -u test@comp30023 -n 2 retrieve unimelb-comp30023-2024.cloud.edu.au | diff - out/ret-nul.out
 ./fetchmail -f more -p pass -u test@comp30023 -n 1 parse unimelb-comp30023-2024.cloud.edu.au | diff - out/parse-mst-tab.out
 ./fetchmail -u test@comp30023 -p pass -f Test -n '1:2' retrieve unimelb-comp30023-2024.cloud.edu.au
