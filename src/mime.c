@@ -4,7 +4,7 @@
 
 int get_mime(char *buffer) {
 
-    // printf("Buffer:\n %s\n", buffer);
+    // fprintf(stderr, "Buffer:\n %s\n", buffer);
 
     // Setup required content type for search
     char *content_type = "Content-Type: text/plain;";
@@ -33,6 +33,7 @@ int get_mime(char *buffer) {
     // printf("Boundary: %s\n", boundary);
 
     int has_mime = 0;
+    end = NULL;
 
     // printf("boundary_ptr:\n %s\n", boundary_ptr);
     // Continue until end of buffer
@@ -43,6 +44,7 @@ int get_mime(char *buffer) {
             if (has_mime == 0) {
                 fprintf(stderr, "No content type found\n");
             }
+            fprintf(stderr, "Exiting: code 6\n");
             exit(6);
         }
         // Check if content type is text/plain
@@ -56,13 +58,15 @@ int get_mime(char *buffer) {
             char *start = strstr(content_type_ptr, "\r\n\r\n");
             if (start == NULL) {
                 fprintf(stderr, "No message found\n");
+                fprintf(stderr, "Exiting: code 7\n");
                 exit(7);
             }
             start += 4;
             // Find the end of the message
-            char *end = strstr(start, boundary);
+            end = strstr(start, boundary);
             if (end == NULL) {
                 fprintf(stderr, "No end of message found\n");
+                fprintf(stderr, "Exiting: code 8\n");
                 exit(8);
             }
 
@@ -75,11 +79,15 @@ int get_mime(char *buffer) {
             free(message);
         }
         // Find the next boundary
-        boundary_ptr = strstr(boundary_ptr + 1, boundary);
+        boundary_ptr = strstr(end + 1, boundary);
+        
+        // check if boundary is end of message
+        if (*(boundary_ptr + strlen(boundary)) == '-') {
+            break;
+        }
     }
 
     free(boundary);
-    free(buffer);
 
     // No required content type with the desired charset and transferencoding
     // found
