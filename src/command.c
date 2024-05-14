@@ -39,7 +39,7 @@ char *create_command(int num_strs, ...) {
 }
 
 char *add_tag(char *tag, char *str) {
-    char *total_str = (char *)malloc(strlen(*tag) + strlen(str) + 2);
+    char *total_str = (char *)malloc(strlen(tag) + strlen(str) + 2);
     check_memory(total_str);
     strcpy(total_str, tag);
     strcat(total_str, " ");
