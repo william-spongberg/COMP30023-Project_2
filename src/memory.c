@@ -20,3 +20,9 @@ void free_memory(FILE *stream, int num_ptrs, ...) {
         fclose(stream);
     }
 }
+
+void free_string(char *str) {
+    if (str != NULL && strlen(str) > 0) {
+        free(str);
+    }
+}

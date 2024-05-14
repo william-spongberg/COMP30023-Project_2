@@ -38,32 +38,25 @@ char *create_command(int num_strs, ...) {
     return total_command;
 }
 
+char *add_tag(char *tag, char *str) {
+    char *total_str = (char *)malloc(strlen(tag) + strlen(str) + 2);
+    check_memory(total_str);
+    strcpy(total_str, tag);
+    strcat(total_str, " ");
+    strcat(total_str, str);
+
+    return total_str;
+}
+
 void send_command(char *command, char **tag, char **buffer, int connfd,
                   FILE *stream) {
-    // initialise commands
-
-    // total command
     get_num_tag(*tag, MAX_TAG_SIZE);
-    char *total_command = (char *)malloc(strlen(*tag) + strlen(command) + 2);
-    check_memory(total_command);
-    strcpy(total_command, *tag);
-    strcat(total_command, " ");
-    strcat(total_command, command);
-    // ok command
-    char *ok_command = malloc(strlen(*tag) + 4);
-    check_memory(ok_command);
-    strcpy(ok_command, *tag);
-    strcat(ok_command, " OK");
-    // no command
-    char *no_command = malloc(strlen(*tag) + 4);
-    check_memory(no_command);
-    strcpy(no_command, *tag);
-    strcat(no_command, " NO");
-    // bad command
-    char *bad_command = malloc(strlen(*tag) + 5);
-    check_memory(bad_command);
-    strcpy(bad_command, *tag);
-    strcat(bad_command, " BAD");
+
+    // initialise commands
+    char *total_command = add_tag(*tag, command);
+    char *ok_command = add_tag(*tag, OK);
+    char *no_command = add_tag(*tag, NO);
+    char *bad_command = add_tag(*tag, BAD);
 
     // send command to server
     write(connfd, total_command, strlen(total_command));

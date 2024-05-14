@@ -1,4 +1,5 @@
 #include "parse.h"
+#include "memory.h"
 #include "retrieve.h"
 
 void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
@@ -7,61 +8,96 @@ void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
     retrieve_headers(str_message_num, tag, buffer, connfd, stream);
 
     // get headers from first occurence of header title
-    char *from = get_message(strcasestr(*buffer, "From: "));
-    char *to = get_message(strcasestr(*buffer, "To: "));
-    char *date = get_message(strcasestr(*buffer, "Date: "));
-    char *subject = get_message(strcasestr(*buffer, "Subject: "));
+    char *from = get_message(strcasestr(*buffer, FROM));
+    char *to = get_message(strcasestr(*buffer, TO));
+    char *date = get_message(strcasestr(*buffer, DATE));
+    char *subject = get_message(strcasestr(*buffer, SUBJECT));
 
     // print headers
-    printf("From:%s\n", from);
-    printf("To:%s\n", to);
-    printf("Date:%s\n", date);
-    printf("Subject:%s\n", subject);
+    print_header(FROM, from);
+    print_header(TO, to);
+    print_header(DATE, date);
+
+    printf(SUBJECT);
+    if (subject != NULL) {
+        printf(" %s\n", subject);
+    }
+    else {
+        printf(" %s\n", NO_SUBJECT);
+    }
 
     // free memory
-    if (strlen(from) > 0){
-        free(from);
-    }
+    free_string(from);
+    free_string(to);
+    free_string(date);
+    free_string(subject);
+}
 
-    if (strlen(to) > 0) {
-        free(to);
-    }
-
-    if (strlen(date) > 0){
-        free(date);
-    }
-
-    if (strlen(subject) > 0){
-        free(subject);
-    }
-
+void print_header(char *header, char *str) {
+    printf("%s", header);
+    if (str != NULL)
+        printf(" %s\n", str);
+    else
+        printf("\n");
 }
 
 char *get_message(char *header) {
     if (header == NULL) {
-        return "";
-        //exit(3);
+        return NULL;
     }
+
     // remove first word
     char *start = strchr(header, ' ') + 1;
     check_memory(start);
+
     // remove trailing chars after message
-    char *end = strchr(header, '\n');
+    char *end = strstr(header, "\r\n");
     check_memory(end);
 
-    // If the length of the message is 0, return empty string
+    // if length of the message is 0, return empty string
     if (end - start <= 0) {
-        char *empty = (char *)malloc(1);
-        check_memory(empty);
-        empty[0] = '\0';
-        return empty;
+        return NULL;
+    }
+
+    // check if next char is aplhanumeric letter (still part of message)
+    char *next_start = NULL;
+    char *next_end = NULL;
+    if (isalpha(*(end + 2)) == 0) {
+        next_start = end + 2;
+        next_end = strstr(end + 2, "\r\n");
+        check_memory(next_end);
     }
 
     // copy message
-    char *message = (char *)malloc(end - start + 2);
+    char *message = copy_message(start, end, next_start, next_end);
     check_memory(message);
-    strcpy(message, " ");
-    strncat(message, start, end - start);
-    message[end - start + 1] = '\0';
+
+    // remove trailing whitespace
+    char *end_of_message = message + strlen(message) - 1;
+    while (isspace(*end_of_message)) {
+        *end_of_message = '\0';
+        end_of_message--;
+    }
+
+    return message;
+}
+
+char *copy_message(char *start, char *end, char *next_start, char *next_end) {
+    char *message = NULL;
+    if (next_start == NULL || next_end == NULL) {
+        message = (char *)malloc(end - start + 1);
+        check_memory(message);
+        strncpy(message, start, end - start);
+        message[end - start] = '\0';
+    }
+    else {
+        message = (char *)malloc(next_end - start + 2);
+        check_memory(message);
+        strncpy(message, start, end - start);
+        message[end - start] = '\0';
+        strncat(message, next_start, next_end - next_start + 1);
+        message[next_end - start + 1] = '\0';
+    }
+
     return message;
 }

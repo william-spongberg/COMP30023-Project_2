@@ -17,5 +17,4 @@
 // Content transfer encoding quoted-printable | 7bit | 8bit
 
 int get_mime(char *buffer);
-void parse_mime(char *buffer);
 #endif
