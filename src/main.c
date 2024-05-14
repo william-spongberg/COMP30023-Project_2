@@ -1,6 +1,7 @@
 #include "command.h"
 #include "connect.h"
 #include "input.h"
+#include "list.h"
 #include "login.h"
 #include "memory.h"
 #include "mime.h"
@@ -62,32 +63,33 @@ int main(int argc, char *argv[]) {
     // commands
     if (strcmp(command, "retrieve") == 0) {
         // printf("[retrieve]\n");
-        char *body = retrieve_body(str_message_num, &tag, &buffer, connfd, stream);
+        char *body =
+            retrieve_body(str_message_num, &tag, &buffer, connfd, stream);
         // print response
         printf("%s\r\n", body);
         // printf("\n");
         memset(buffer, 0, MAX_DATA_SIZE);
         free(body);
     } else if (strcmp(command, "parse") == 0) {
-        //printf("[parse]\n");
+        // printf("[parse]\n");
         parse_headers(str_message_num, &tag, &buffer, connfd, stream);
         memset(buffer, 0, MAX_DATA_SIZE);
     } else if (strcmp(command, "mime") == 0) {
-        //printf("[mime]\n");
-        // TODO: fix mime
+        // printf("[mime]\n");
+        //  TODO: fix mime
         char *body = create_command(3, FETCH, str_message_num, "BODY.PEEK[]");
         send_command(body, &tag, &buffer, connfd, stream);
-        //printf("Received:\n%s\n", buffer);
-        //printf("\n");
-        // parse_mime(buffer);
+        // printf("Received:\n%s\n", buffer);
+        // printf("\n");
+        //  parse_mime(buffer);
         get_mime(buffer);
         memset(buffer, 0, MAX_DATA_SIZE);
         free(body);
     } else if (strcmp(command, "list") == 0) {
-        //printf("[list]\n");
-        // TODO: fix fetch command not returning anything
-        // TODO: use list.c methods
-        // fetch command
+        // printf("[list]\n");
+        //  TODO: fix fetch command not returning anything
+        //  TODO: use list.c methods
+        //  fetch command
         char *fetch_command =
             create_command(1, "UID FETCH 1:* (BODY[HEADER.FIELDS (SUBJECT)])");
         send_command(fetch_command, &tag, &buffer, connfd, stream);

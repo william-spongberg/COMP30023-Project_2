@@ -1,5 +1,6 @@
 #include "parse.h"
 #include "retrieve.h"
+#include "memory.h"
 
 void parse_headers(char *str_message_num, char **tag, char **buffer, int connfd,
                    FILE *stream) {
