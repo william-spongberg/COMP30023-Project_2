@@ -72,11 +72,12 @@ int get_mime(char *buffer) {
 
             char *message = (char *)malloc(end - start + 2);
             check_memory(message);
-            strncpy(message, start, end - start);
-            message[end - start - 1] = '\0';
-            has_mime = 1;
+            strncpy(message, start, end - start - 2);
+            message[end - start - 3] = '\0';
             printf("%s\n", message);
             free(message);
+
+            has_mime = 1;
         }
         // Find the next boundary
         boundary_ptr = strstr(end + 1, boundary);
