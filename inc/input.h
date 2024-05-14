@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_MESSAGE_NUM_SIZE 10
+#define MAX_MESSAGE_NUM_SIZE 100
 #define FORMAT                                                                 \
     "Usage: -u <username> -p <password> [-f <folder>] [-n <messageNum>] [-t] " \
     "<command> <server_name> \n"
