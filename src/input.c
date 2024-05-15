@@ -67,28 +67,5 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         exit(1);
     }
 
-    // make sure not trying to inject
-    make_input_safe(*username);
-    make_input_safe(*password);
-    make_input_safe(*folder);
-    make_input_safe(*str_message_num);
-    make_input_safe(*command);
-    make_input_safe(*server_name);
 }
 
-void make_input_safe(char *str) {
-    // remove carriage return and semicolon from string
-    if (str == NULL) {
-        return;
-    }
-
-    char *pos = strchr(str, '\r');
-    if (pos != NULL) {
-        *pos = '\0';
-    }
-
-    char *pos2 = strchr(str, ';');
-    if (pos2 != NULL) {
-        *pos2 = '\0';
-    }
-}
