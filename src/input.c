@@ -85,12 +85,6 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         fprintf(stderr, FORMAT);
         exit(1);
     }
-
-    // make sure not trying to inject
-    check_input_safe(*username);
-    check_input_safe(*password);
-    check_input_safe(*folder);
-    check_input_safe(*str_message_num);
-    check_input_safe(*command);
-    check_input_safe(*server_name);
 }
+
+
