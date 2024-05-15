@@ -1,5 +1,24 @@
 #include "input.h"
 
+void check_input_safe(char *str) {
+    // remove carriage return and semicolon from string
+    if (str == NULL) {
+        return;
+    }
+
+    char *pos = strchr(str, '\r');
+    if (pos != NULL) {
+        fprintf(stderr, "Invalid character in input\n");
+        exit(1);
+    }
+
+    pos = strchr(str, ';');
+    if (pos != NULL) {
+        fprintf(stderr, "Invalid character in input\n");
+        exit(1);
+    }
+}
+
 void read_command_line(int argc, char *argv[], char **username, char **password,
                        char **folder, char **str_message_num, char **command,
                        char **server_name) {
@@ -66,6 +85,6 @@ void read_command_line(int argc, char *argv[], char **username, char **password,
         fprintf(stderr, FORMAT);
         exit(1);
     }
-
 }
+
 
