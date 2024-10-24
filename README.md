@@ -6,6 +6,8 @@
 
 ---
 
+Simple email client written in C that downloads and parses email from a standards-compliant IMAP server.
+
 Find assignment details [here](/COMP30023_2024_Project2-release.pdf).
 
 ## Format
